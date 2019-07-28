@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  第九章的习题暂时跳过了，先更第十章。开学了，事情多了起来，还要找工作，加把劲最近把这本书刷完吧！:P 其实从第8章开始，这本书对于monad就讲的太少，过几天这本书要出第二版，希望能在这方面改进改进。。。我下单了一本《Haskell趣学指南》，打算结">
+<meta name="keywords" content="Haskell,Programming in Haskell">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Programming in Haskell Chapter10 Exercises Solutions">
+<meta property="og:url" content="http://duanyifu.com/2016/09/13/PIHex10/index.html">
+<meta property="og:site_name" content="Yifu&#39;s Blog">
+<meta property="og:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  第九章的习题暂时跳过了，先更第十章。开学了，事情多了起来，还要找工作，加把劲最近把这本书刷完吧！:P 其实从第8章开始，这本书对于monad就讲的太少，过几天这本书要出第二版，希望能在这方面改进改进。。。我下单了一本《Haskell趣学指南》，打算结">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2016-09-13T19:49:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Programming in Haskell Chapter10 Exercises Solutions">
+<meta name="twitter:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  第九章的习题暂时跳过了，先更第十章。开学了，事情多了起来，还要找工作，加把劲最近把这本书刷完吧！:P 其实从第8章开始，这本书对于monad就讲的太少，过几天这本书要出第二版，希望能在这方面改进改进。。。我下单了一本《Haskell趣学指南》，打算结">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Yifu's Blog" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="http://duanyifu.com/2016/09/13/PIHex10/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  
+  <title>Programming in Haskell Chapter10 Exercises Solutions | Yifu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yifu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2016/09/13/PIHex10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yifu Duan">
+      <meta itemprop="description" content="Contact me at me###duanyifu.com">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yifu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Programming in Haskell Chapter10 Exercises Solutions
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-09-13 21:11:45" itemprop="dateCreated datePublished" datetime="2016-09-13T21:11:45+08:00">2016-09-13</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2016-09-14 03:49:22" itemprop="dateModified" datetime="2016-09-14T03:49:22+08:00">2016-09-14</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Haskell/" itemprop="url" rel="index"><span itemprop="name">Haskell</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
+<hr>
+<p>第九章的习题暂时跳过了，先更第十章。<br>开学了，事情多了起来，还要找工作，加把劲最近把这本书刷完吧！:P</p>
+<p>其实从第8章开始，这本书对于monad就讲的太少，过几天这本书要出第二版，希望能在这方面改进改进。。。<br>我下单了一本《Haskell趣学指南》，打算结合起来看，然后再补上跳过的习题。</p>
+<hr>
+<h4 id="定义函数-mult-Nat-gt-Nat-gt-Nat"><a href="#定义函数-mult-Nat-gt-Nat-gt-Nat" class="headerlink" title="定义函数 mult :: Nat -&gt; Nat -&gt; Nat"></a>定义函数 mult :: Nat -&gt; Nat -&gt; Nat</h4><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">data</span> <span class="type">Nat</span> = <span class="type">Zero</span> | <span class="type">Succ</span> <span class="type">Nat</span></span></span><br><span class="line"><span class="title">nat2int</span> :: <span class="type">Nat</span> -&gt; <span class="type">Int</span></span><br><span class="line"><span class="title">nat2int</span> <span class="type">Zero</span> = <span class="number">0</span></span><br><span class="line"><span class="title">nat2int</span> (<span class="type">Succ</span> n) = <span class="number">1</span> + nat2int n</span><br><span class="line"></span><br><span class="line"><span class="title">int2nat</span> :: <span class="type">Int</span> -&gt; <span class="type">Nat</span></span><br><span class="line"><span class="title">int2nat</span> <span class="number">0</span> = <span class="type">Zero</span></span><br><span class="line"><span class="title">int2nat</span> n = <span class="type">Succ</span> (int2nat (n - <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="title">add</span> :: <span class="type">Nat</span> -&gt; <span class="type">Nat</span> -&gt; <span class="type">Nat</span></span><br><span class="line"><span class="title">add</span> <span class="type">Zero</span> n = n</span><br><span class="line"><span class="title">add</span> (<span class="type">Succ</span> m) n = <span class="type">Succ</span> (add m n)</span><br><span class="line"></span><br><span class="line"><span class="title">mult</span> :: <span class="type">Nat</span> -&gt; <span class="type">Nat</span> -&gt; <span class="type">Nat</span></span><br><span class="line"><span class="title">mult</span> <span class="type">Zero</span> _ = <span class="type">Zero</span></span><br><span class="line"><span class="title">mult</span> (<span class="type">Succ</span> m) n = add (mult m n) n</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; nat2int(mult (int2nat 2) (int2nat 3))</span></span><br><span class="line"><span class="comment">-- 6</span></span><br><span class="line"><span class="comment">-- *Main&gt; nat2int(mult (int2nat 0) (int2nat 3))</span></span><br><span class="line"><span class="comment">-- 0</span></span><br><span class="line"><span class="comment">-- *Main&gt; nat2int(mult (int2nat 1) (int2nat 3))</span></span><br><span class="line"><span class="comment">-- 3</span></span><br><span class="line"><span class="comment">-- *Main&gt; nat2int(mult (int2nat 10) (int2nat 13))</span></span><br><span class="line"><span class="comment">-- 130</span></span><br></pre></td></tr></table></figure>
+<h4 id="重新定义occurs-Int-gt-Tree-gt-Bool"><a href="#重新定义occurs-Int-gt-Tree-gt-Bool" class="headerlink" title="重新定义occurs :: Int -&gt; Tree -&gt; Bool"></a>重新定义<code>occurs :: Int -&gt; Tree -&gt; Bool</code></h4><p>需要使用标准库<code>data Ordering = LT | EQ | GT</code>, 以及<br><code>compare :: Ord =&gt; a -&gt; a -&gt; Ordering</code>。<br><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">data</span> <span class="type">Tree</span> = <span class="type">Leaf</span> <span class="type">Int</span> | <span class="type">Node</span> <span class="type">Tree</span> <span class="type">Int</span> <span class="type">Tree</span></span></span><br><span class="line"><span class="title">tr</span> :: <span class="type">Tree</span></span><br><span class="line"><span class="title">tr</span> = <span class="type">Node</span> (<span class="type">Node</span> (<span class="type">Leaf</span> <span class="number">1</span>) <span class="number">3</span> (<span class="type">Leaf</span> <span class="number">4</span>)) <span class="number">5</span> (<span class="type">Node</span> (<span class="type">Leaf</span> <span class="number">6</span>) <span class="number">7</span> (<span class="type">Leaf</span> <span class="number">9</span>))</span><br><span class="line"><span class="title">occurs</span> :: <span class="type">Int</span> -&gt; <span class="type">Tree</span> -&gt; <span class="type">Bool</span></span><br><span class="line"><span class="title">occurs</span> m (<span class="type">Leaf</span> n) = m == n</span><br><span class="line"><span class="title">occurs</span> m (<span class="type">Node</span> l n r) = <span class="keyword">case</span> compare m n <span class="keyword">of</span></span><br><span class="line">                            <span class="type">LT</span> -&gt; occurs m l</span><br><span class="line">                            <span class="type">EQ</span> -&gt; <span class="type">True</span></span><br><span class="line">                            <span class="type">GT</span> -&gt; occurs m r</span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<h4 id="判断平衡树balanced-Tree-gt-Bool"><a href="#判断平衡树balanced-Tree-gt-Bool" class="headerlink" title="判断平衡树balanced :: Tree -&gt; Bool"></a>判断平衡树<code>balanced :: Tree -&gt; Bool</code></h4><p>平衡树：左、右子树的叶子数量相差不超过一个<br><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">data</span> <span class="type">Tree1</span> = <span class="type">Leaf1</span> <span class="type">Int</span> | <span class="type">Node1</span> <span class="type">Tree1</span> <span class="type">Tree1</span></span></span><br><span class="line"></span><br><span class="line"><span class="title">t1</span> :: <span class="type">Tree1</span></span><br><span class="line"><span class="title">t1</span> = <span class="type">Node1</span> (<span class="type">Node1</span> (<span class="type">Leaf1</span> <span class="number">1</span>) (<span class="type">Leaf1</span> <span class="number">4</span>)) (<span class="type">Node1</span> (<span class="type">Leaf1</span> <span class="number">6</span>) (<span class="type">Leaf1</span> <span class="number">9</span>))</span><br><span class="line"></span><br><span class="line"><span class="title">t2</span> :: <span class="type">Tree1</span></span><br><span class="line"><span class="title">t2</span> = <span class="type">Node1</span> (<span class="type">Node1</span> (<span class="type">Leaf1</span> <span class="number">1</span>) (<span class="type">Node1</span> (<span class="type">Leaf1</span> <span class="number">1</span>) (<span class="type">Leaf1</span> <span class="number">4</span>))) (<span class="type">Node1</span> (<span class="type">Leaf1</span> <span class="number">6</span>) (<span class="type">Leaf1</span> <span class="number">9</span>))</span><br><span class="line"></span><br><span class="line"><span class="title">t3</span> :: <span class="type">Tree1</span></span><br><span class="line"><span class="title">t3</span> = <span class="type">Node1</span> (<span class="type">Node1</span> (<span class="type">Leaf1</span> <span class="number">1</span>) (<span class="type">Node1</span> (<span class="type">Leaf1</span> <span class="number">1</span>) (<span class="type">Leaf1</span> <span class="number">4</span>))) (<span class="type">Leaf1</span> <span class="number">6</span>)</span><br><span class="line"><span class="title">leafs</span> :: <span class="type">Tree1</span> -&gt; <span class="type">Int</span></span><br><span class="line"><span class="title">leafs</span> (<span class="type">Leaf1</span> _) = <span class="number">1</span></span><br><span class="line"><span class="title">leafs</span> (<span class="type">Node1</span> l r) = leafs l + leafs r</span><br><span class="line"></span><br><span class="line"><span class="title">balanced</span> :: <span class="type">Tree1</span> -&gt; <span class="type">Bool</span></span><br><span class="line"><span class="title">balanced</span> (<span class="type">Leaf1</span> _) = <span class="type">True</span></span><br><span class="line"><span class="title">balanced</span> (<span class="type">Node1</span> l r) = abs (leafs l - leafs r) &lt;= <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; balanced t1</span></span><br><span class="line"><span class="comment">-- True</span></span><br><span class="line"><span class="comment">-- *Main&gt; balanced t2</span></span><br><span class="line"><span class="comment">-- True</span></span><br><span class="line"><span class="comment">-- *Main&gt; balanced t3</span></span><br><span class="line"><span class="comment">-- False</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="根据list生成一个平衡树"><a href="#根据list生成一个平衡树" class="headerlink" title="根据list生成一个平衡树"></a>根据list生成一个平衡树</h4><p>思路也蛮简单，把list分成两半，然后递归就成了。</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">balance</span> :: [<span class="type">Int</span>] -&gt; <span class="type">Tree1</span></span><br><span class="line"><span class="title">balance</span> xs</span><br><span class="line">    | null xs = error <span class="string">""</span></span><br><span class="line">    | length xs == <span class="number">1</span> = <span class="type">Leaf1</span> (head xs)</span><br><span class="line">    | otherwise = <span class="type">Node1</span> (balance x) (balance y)</span><br><span class="line">                    <span class="keyword">where</span> n = length xs `div` <span class="number">2</span></span><br><span class="line">                          x = take n xs</span><br><span class="line">                          y = drop n xs</span><br><span class="line"></span><br><span class="line"><span class="title">flatten</span> :: <span class="type">Tree1</span> -&gt; [<span class="type">Int</span>]</span><br><span class="line"><span class="title">flatten</span> (<span class="type">Leaf1</span> n) = [n]</span><br><span class="line"><span class="title">flatten</span> (<span class="type">Node1</span> l r) = flatten l ++ flatten r</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; flatten (balance [])</span></span><br><span class="line"><span class="comment">-- *** Exception:</span></span><br><span class="line"><span class="comment">-- CallStack (from HasCallStack):</span></span><br><span class="line"><span class="comment">--   error, called at ch10ex.hs:71:24 in main:Main</span></span><br><span class="line"><span class="comment">-- *Main&gt; flatten (balance [1])</span></span><br><span class="line"><span class="comment">-- [1]</span></span><br><span class="line"><span class="comment">-- *Main&gt; flatten (balance [1,2,3,4])</span></span><br><span class="line"><span class="comment">-- [1,2,3,4]</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h4 id="修改Tautology-checker使之支持-disjunction-和-lt-gt-equivalence-运算符"><a href="#修改Tautology-checker使之支持-disjunction-和-lt-gt-equivalence-运算符" class="headerlink" title="修改Tautology checker使之支持\/(disjunction)和&lt;=&gt;(equivalence)运算符"></a>修改Tautology checker使之支持<code>\/</code>(disjunction)和<code>&lt;=&gt;</code>(equivalence)运算符</h4><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">type</span> <span class="type">Assoc</span> k v = [(<span class="title">k</span>, <span class="title">v</span>)]</span></span><br><span class="line"><span class="title">find</span> :: <span class="type">Eq</span> k =&gt; k -&gt; <span class="type">Assoc</span> k v -&gt; v</span><br><span class="line"><span class="title">find</span> k t = head [v | (k', v) &lt;- t, k == k']</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">data</span> <span class="type">Prop</span> = <span class="type">Const</span> <span class="type">Bool</span></span></span><br><span class="line">          | <span class="type">Var</span> <span class="type">Char</span></span><br><span class="line">          | <span class="type">Not</span> <span class="type">Prop</span></span><br><span class="line">          | <span class="type">And</span> <span class="type">Prop</span> <span class="type">Prop</span></span><br><span class="line">          | <span class="type">Disj</span> <span class="type">Prop</span> <span class="type">Prop</span> <span class="comment">-- disjunction</span></span><br><span class="line">          | <span class="type">Equi</span> <span class="type">Prop</span> <span class="type">Prop</span> <span class="comment">-- equivalence</span></span><br><span class="line">          | <span class="type">Imply</span> <span class="type">Prop</span> <span class="type">Prop</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="type">Subst</span> = <span class="type">Assoc</span> <span class="type">Char</span> <span class="type">Bool</span></span></span><br><span class="line"><span class="comment">-- [('A', True), ('B', False)]</span></span><br><span class="line"></span><br><span class="line"><span class="title">eval</span> :: <span class="type">Subst</span> -&gt; <span class="type">Prop</span> -&gt; <span class="type">Bool</span></span><br><span class="line"><span class="title">eval</span> _ (<span class="type">Const</span> b) = b</span><br><span class="line"><span class="title">eval</span> s (<span class="type">Var</span> x) = find x s</span><br><span class="line"><span class="title">eval</span> s (<span class="type">Not</span> p) = not (eval s p)</span><br><span class="line"><span class="title">eval</span> s (<span class="type">And</span> p q) = eval s p &amp;&amp; eval s q</span><br><span class="line"><span class="title">eval</span> s (<span class="type">Disj</span> p q) = eval s p || eval s q</span><br><span class="line"><span class="title">eval</span> s (<span class="type">Equi</span> p q) = eval s p == eval s q</span><br><span class="line"><span class="title">eval</span> s (<span class="type">Imply</span> p q) = eval s p &lt;= eval s q</span><br><span class="line"></span><br><span class="line"><span class="title">vars</span> :: <span class="type">Prop</span> -&gt; <span class="type">String</span></span><br><span class="line"><span class="title">vars</span> (<span class="type">Const</span> _) = []</span><br><span class="line"><span class="title">vars</span> (<span class="type">Var</span> x) = [x]</span><br><span class="line"><span class="title">vars</span> (<span class="type">Not</span> p) = vars p</span><br><span class="line"><span class="title">vars</span> (<span class="type">And</span> p q) = vars p ++ vars q</span><br><span class="line"><span class="title">vars</span> (<span class="type">Disj</span> p q) = vars p ++ vars q</span><br><span class="line"><span class="title">vars</span> (<span class="type">Equi</span> p q) = vars p ++ vars q</span><br><span class="line"><span class="title">vars</span> (<span class="type">Imply</span> p q) = vars p ++ vars q</span><br><span class="line"></span><br><span class="line"><span class="title">bools</span> :: <span class="type">Int</span> -&gt; [[<span class="type">Bool</span>]]</span><br><span class="line"><span class="title">bools</span> <span class="number">0</span> = [[]]</span><br><span class="line"><span class="title">bools</span> n = map (<span class="type">False</span>:) bss ++ map (<span class="type">True</span>:) bss</span><br><span class="line">                    <span class="keyword">where</span> bss = bools (n - <span class="number">1</span>)</span><br><span class="line"><span class="title">rmdups</span> :: <span class="type">Eq</span> a =&gt; [a] -&gt; [a]</span><br><span class="line"><span class="title">rmdups</span> [] = []</span><br><span class="line"><span class="title">rmdups</span> (x : xs) = x : rmdups (filter (/= x) xs)</span><br><span class="line"></span><br><span class="line"><span class="title">substs</span> :: <span class="type">Prop</span> -&gt; [<span class="type">Subst</span>]</span><br><span class="line"><span class="title">substs</span> p = map (zip us) (bools (length us))</span><br><span class="line">            <span class="keyword">where</span> us = rmdups (vars p)</span><br><span class="line"><span class="title">isTaut</span> :: <span class="type">Prop</span> -&gt; <span class="type">Bool</span></span><br><span class="line"><span class="title">isTaut</span> p = and [eval s p | s &lt;- substs p]</span><br><span class="line"></span><br><span class="line"><span class="title">p1</span> :: <span class="type">Prop</span></span><br><span class="line"><span class="title">p1</span> = <span class="type">Equi</span> (<span class="type">Var</span> '<span class="type">A'</span>) (<span class="type">Not</span> (<span class="type">Var</span> '<span class="type">A'</span>))</span><br><span class="line"><span class="title">p2</span> :: <span class="type">Prop</span></span><br><span class="line"><span class="title">p2</span> = <span class="type">Equi</span> (<span class="type">Var</span> '<span class="type">A'</span>) (<span class="type">Var</span> '<span class="type">A'</span>)</span><br><span class="line"><span class="title">p3</span> :: <span class="type">Prop</span></span><br><span class="line"><span class="title">p3</span> = <span class="type">Equi</span> (<span class="type">Disj</span> (<span class="type">Not</span> (<span class="type">Var</span> '<span class="type">B'</span>)) (<span class="type">Var</span> '<span class="type">A'</span>)) (<span class="type">Disj</span> (<span class="type">Var</span> '<span class="type">A'</span>) (<span class="type">Var</span> '<span class="type">B'</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">-- p4 : (!(!(!P \/ Q) \/ P) \/ P)</span></span><br><span class="line"><span class="title">p4</span> :: <span class="type">Prop</span></span><br><span class="line"><span class="title">p4</span> = <span class="type">Disj</span> (<span class="type">Not</span> (<span class="type">Disj</span> (<span class="type">Not</span> (<span class="type">Disj</span> (<span class="type">Not</span> (<span class="type">Var</span> '<span class="type">A'</span>)) (<span class="type">Var</span> '<span class="type">B'</span>))) (<span class="type">Var</span> '<span class="type">A'</span>))) (<span class="type">Var</span> '<span class="type">A'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; isTaut p1</span></span><br><span class="line"><span class="comment">-- False</span></span><br><span class="line"><span class="comment">-- *Main&gt; isTaut p2</span></span><br><span class="line"><span class="comment">-- True</span></span><br><span class="line"><span class="comment">-- *Main&gt; isTaut p3</span></span><br><span class="line"><span class="comment">-- False</span></span><br><span class="line"><span class="comment">-- *Main&gt; isTaut p4</span></span><br><span class="line"><span class="comment">-- True</span></span><br></pre></td></tr></table></figure>
+<h4 id="扩展Abstract-machine使之支持乘法"><a href="#扩展Abstract-machine使之支持乘法" class="headerlink" title="扩展Abstract machine使之支持乘法"></a>扩展Abstract machine使之支持乘法</h4><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 7 abstract machine</span></span><br><span class="line"><span class="class"><span class="keyword">data</span> <span class="type">Expr</span> = <span class="type">Val</span> <span class="type">Int</span> | <span class="type">Add</span> <span class="type">Expr</span> <span class="type">Expr</span> | <span class="type">Mul</span> <span class="type">Expr</span> <span class="type">Expr</span></span></span><br><span class="line"><span class="comment">-- value :: Expr -&gt; Int</span></span><br><span class="line"><span class="comment">-- value (Val n) = n</span></span><br><span class="line"><span class="comment">-- value (Add x y) = value x + value y</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">type</span> <span class="type">Cont</span> = [<span class="type">Op</span>]</span></span><br><span class="line"><span class="class"><span class="keyword">data</span> <span class="type">Op</span> = <span class="type">EVALADD</span> <span class="type">Expr</span> | <span class="type">EVALMUL</span> <span class="type">Expr</span> | <span class="type">ADD</span> <span class="type">Int</span> | <span class="type">MUL</span> <span class="type">Int</span></span></span><br><span class="line"></span><br><span class="line"><span class="title">eval</span> :: <span class="type">Expr</span> -&gt; <span class="type">Cont</span> -&gt; <span class="type">Int</span></span><br><span class="line"><span class="title">eval</span> (<span class="type">Val</span> n) c = exec c n</span><br><span class="line"><span class="title">eval</span> (<span class="type">Add</span> x y) c = eval x (<span class="type">EVALADD</span> y : c)</span><br><span class="line"><span class="title">eval</span> (<span class="type">Mul</span> x y) c = eval x (<span class="type">EVALMUL</span> y : c)</span><br><span class="line"></span><br><span class="line"><span class="title">exec</span> :: <span class="type">Cont</span> -&gt; <span class="type">Int</span> -&gt; <span class="type">Int</span></span><br><span class="line"><span class="title">exec</span> [] n = n</span><br><span class="line"><span class="title">exec</span> (<span class="type">EVALADD</span> y : c) n = eval y (<span class="type">ADD</span> n : c)</span><br><span class="line"><span class="title">exec</span> (<span class="type">EVALMUL</span> y : c) n = eval y (<span class="type">MUL</span> n : c)</span><br><span class="line"><span class="title">exec</span> (<span class="type">ADD</span> n : c) m = exec c (n + m)</span><br><span class="line"><span class="title">exec</span> (<span class="type">MUL</span> n : c) m = exec c (n * m)</span><br><span class="line"></span><br><span class="line"><span class="title">value</span> :: <span class="type">Expr</span> -&gt; <span class="type">Int</span></span><br><span class="line"><span class="title">value</span> e = eval e []</span><br><span class="line"></span><br><span class="line"><span class="title">p1</span> :: <span class="type">Expr</span></span><br><span class="line"><span class="title">p1</span> = <span class="type">Add</span> (<span class="type">Mul</span> (<span class="type">Val</span> <span class="number">3</span>) (<span class="type">Val</span> <span class="number">2</span>)) (<span class="type">Val</span> <span class="number">5</span>) <span class="comment">-- 3 * 2 + 5</span></span><br><span class="line"></span><br><span class="line"><span class="title">p2</span> :: <span class="type">Expr</span></span><br><span class="line"><span class="title">p2</span> = <span class="type">Add</span> (<span class="type">Mul</span> (<span class="type">Val</span> <span class="number">3</span>) (<span class="type">Add</span> (<span class="type">Val</span> <span class="number">3</span>) (<span class="type">Val</span> <span class="number">2</span>))) (<span class="type">Val</span> <span class="number">1</span>) <span class="comment">-- 3 * (3 + 2) + 1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; value p2</span></span><br><span class="line"><span class="comment">-- 16</span></span><br><span class="line"><span class="comment">-- *Main&gt; value p1</span></span><br><span class="line"><span class="comment">-- 11</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/Haskell/" rel="tag"># Haskell</a>
+          
+            <a href="/tags/Programming-in-Haskell/" rel="tag"># Programming in Haskell</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/08/PIHex8/" rel="next" title="Programming in Haskell Chapter8 Exercises Solutions">
+                <i class="fa fa-chevron-left"></i> Programming in Haskell Chapter8 Exercises Solutions
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/02/ycombinator-in-scheme/" rel="prev" title="Yet Another a Introduction to Y Combinator in Scheme">
+                Yet Another a Introduction to Y Combinator in Scheme <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  
+  <p class="site-author-name" itemprop="name">Yifu Duan</p>
+  <div class="site-description motion-element" itemprop="description">Contact me at me###duanyifu.com</div>
+</div>
+
+
+  <nav class="site-state motion-element">
+    
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span>
+        
+      </div>
+    
+
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+          
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#定义函数-mult-Nat-gt-Nat-gt-Nat"><span class="nav-number">1.</span> <span class="nav-text">定义函数 mult :: Nat -&gt; Nat -&gt; Nat</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重新定义occurs-Int-gt-Tree-gt-Bool"><span class="nav-number">2.</span> <span class="nav-text">重新定义occurs :: Int -&gt; Tree -&gt; Bool</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#判断平衡树balanced-Tree-gt-Bool"><span class="nav-number">3.</span> <span class="nav-text">判断平衡树balanced :: Tree -&gt; Bool</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#根据list生成一个平衡树"><span class="nav-number">4.</span> <span class="nav-text">根据list生成一个平衡树</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改Tautology-checker使之支持-disjunction-和-lt-gt-equivalence-运算符"><span class="nav-number">5.</span> <span class="nav-text">修改Tautology checker使之支持\/(disjunction)和&lt;=&gt;(equivalence)运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#扩展Abstract-machine使之支持乘法"><span class="nav-number">6.</span> <span class="nav-text">扩展Abstract machine使之支持乘法</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yifu Duan</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+</body>
+</html>

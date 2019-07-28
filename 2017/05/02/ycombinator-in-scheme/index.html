@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="前言在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。   运行环境：IDE：DrRacket">
+<meta name="keywords" content="Scheme,Y combinator">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Yet Another a Introduction to Y Combinator in Scheme">
+<meta property="og:url" content="http://duanyifu.com/2017/05/02/ycombinator-in-scheme/index.html">
+<meta property="og:site_name" content="Yifu&#39;s Blog">
+<meta property="og:description" content="前言在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。   运行环境：IDE：DrRacket">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-07-28T14:08:22.075Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Yet Another a Introduction to Y Combinator in Scheme">
+<meta name="twitter:description" content="前言在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。   运行环境：IDE：DrRacket">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Yifu's Blog" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="http://duanyifu.com/2017/05/02/ycombinator-in-scheme/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  
+  <title>Yet Another a Introduction to Y Combinator in Scheme | Yifu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yifu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2017/05/02/ycombinator-in-scheme/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yifu Duan">
+      <meta itemprop="description" content="Contact me at me###duanyifu.com">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yifu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Yet Another a Introduction to Y Combinator in Scheme
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-05-02 15:31:56" itemprop="dateCreated datePublished" datetime="2017-05-02T15:31:56+08:00">2017-05-02</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-28 22:08:22" itemprop="dateModified" datetime="2019-07-28T22:08:22+08:00">2019-07-28</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Programming/" itemprop="url" rel="index"><span itemprop="name">Programming</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。<br>这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。  </p>
+<p>运行环境：<br>IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket</a><br><a id="more"></a></p>
+<h3 id="什么是递归函数？"><a href="#什么是递归函数？" class="headerlink" title="什么是递归函数？"></a>什么是递归函数？</h3><p>我们以递归函数<code>length</code>为例，<code>length</code>函数接受一个list，返回list的元素数目。<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name"><span class="builtin-name">define</span></span> length</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br></pre></td></tr></table></figure><br><strong>若你熟悉Scheme函数定义，可以跳过本小结后面部分。</strong></p>
+<p><code>(define length</code>，<code>define</code>表达式将一个表达式（表达式即可能是函数也可能是值，在Scheme中并不区分这两点）绑定至一个名字，形式如同<code>(define name func)</code>，之后便可以使用<code>name</code>调用<code>func</code>这个函数。在本定义中，<code>func</code>是后面整个用括号包围的<code>lambda</code>表达式，也就是2-4行。<br><code>(lambda args body)</code>，<code>lambda</code>表达式定义了一个匿名函数，表达式中第二个元素是参数列表，第三个元素是函数体。也就是说，这个匿名函数接受一个参数<code>lst</code>，然后对函数体进行求值。<br><code>(if condition then else)</code>,<code>if</code>表达式，若<code>condition</code>为真，则求值<code>then</code>，若<code>condition</code>为假，则求值<code>else</code>。<br><code>null?</code>接受一个list，判断是否为空。<br><code>add1</code>接受一个值，将其加1后返回，定义如下：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name"><span class="builtin-name">define</span></span> add1</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (n)</span><br><span class="line">    (<span class="name"><span class="builtin-name">+</span></span> <span class="number">1</span> n)))</span><br><span class="line"></span><br><span class="line">&gt; (add1 3)</span><br><span class="line"><span class="number">4</span></span><br></pre></td></tr></table></figure><br><code>rest</code>返回<code>lst</code>去掉第一个元素的剩余部分，其实就是<code>(define rest cdr)</code>。<br>也就是说，<code>length</code>函数接受一个list，若list为空，则返回<code>0</code>，若list非空，则求去掉第一个元素的list长度，并将其加一。求值过程如下：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name"><span class="builtin-name">length</span></span> `(<span class="number">1</span> <span class="number">2</span>)) <span class="comment">; `(1 2) is a list has two elements</span></span><br><span class="line">(<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> `(<span class="number">2</span>))) <span class="comment">; `(2) is (rest `(1 2))</span></span><br><span class="line">(<span class="name">add1</span> (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> `()))) <span class="comment">; `() is empty list</span></span><br><span class="line">(<span class="name">add1</span> (<span class="name">add1</span> <span class="number">0</span>))</span><br><span class="line">(<span class="name">add1</span> <span class="number">1</span>)</span><br><span class="line"><span class="number">2</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="假如length没有名字？"><a href="#假如length没有名字？" class="headerlink" title="假如length没有名字？"></a>假如length没有名字？</h3><p>如果我们去掉<code>define</code>，拿出其中的函数定义，是这样。<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))) <span class="comment">; length is undefined</span></span><br></pre></td></tr></table></figure><br><strong>WAIT！！</strong>既然现在没有了<code>length</code>,显然我们也无法在函数体内调用<code>length</code>了。<br>那么我们应该把<code>length</code>换成什么呢？<br>我也不知道。<br>那么我们先试一试换成别的吧。<br>假设我们现在有一个函数<code>id</code>,这个函数什么都不做，只接受一个参数并将其返回，定义如下。<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name"><span class="builtin-name">define</span></span> id</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (x) x))</span><br><span class="line"></span><br><span class="line">&gt; (id 1)</span><br><span class="line"><span class="number">1</span></span><br></pre></td></tr></table></figure><br>那么，我们把<code>id</code>丢进<code>length</code>定义里面试试：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length0</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name">id</span> (<span class="name">rest</span> lst)))))</span><br></pre></td></tr></table></figure><br>看上去是个奇怪的函数，这个函数能工作吗？<br>我们可以试一试。<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt; ((lambda (lst)</span><br><span class="line">   (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">       <span class="number">0</span></span><br><span class="line">       (add1 (id (rest lst)))))</span><br><span class="line"> `())</span><br><span class="line"></span><br><span class="line"><span class="number">0</span></span><br></pre></td></tr></table></figure><br>我们喂给这个奇怪的函数一个空list，它居然能返回正确的值！<br>具体原因，请读者先自己思考一下（笑<br>。<br>。<br>。<br>很简单，因为<code>(null? lst)</code>为真，所以<code>if</code>表达式直接返回了<code>0</code>，压根没有对<code>(add1 (id (rest lst)))</code>进行求值。<br>那么我们如果喂<code>(apple)</code>呢，显然这个奇怪的函数并不能返回正确的长度，因为<code>(id (rest lst))</code>无法给出“去掉第一个值的list的长度”。<br>总结一下，这个奇怪的函数：</p>
+<ul>
+<li>若list长度为0，可以正常工作</li>
+<li>若list长度大于0，无法工作</li>
+</ul>
+<p>那么，我们将这个函数叫做<code>length0</code>,代表它对长度为0及0以下（并不存在）的list可以正常工作。</p>
+<h3 id="length1-length2-and-…"><a href="#length1-length2-and-…" class="headerlink" title="length1, length2, and …"></a>length1, length2, and …</h3><p>好了，我们现在有一个<code>length0</code>，可以求出空表的长度。<br>那么下面这个函数有什么作用呢？<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length1</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name">length0</span> (<span class="name">rest</span> lst)))))</span><br></pre></td></tr></table></figure><br>由于<code>(length0 (rest lst))</code>是可以正确计算的，所以上面这个函数，可以计算长度小于等于1的list的长度。<br>你可能会问，但是我们没有<code>length0</code>这个名字呀？<br>没关系，我们将<code>length0</code>代换成上一小结的匿名函数形式，如下：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length1</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">  (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">      <span class="number">0</span></span><br><span class="line">      (<span class="name">add1</span> ((<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">               (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">                   <span class="number">0</span></span><br><span class="line">                   (<span class="name">add1</span> (<span class="name">id</span> (<span class="name">rest</span> lst)))))</span><br><span class="line">             (<span class="name">rest</span> lst)))))</span><br></pre></td></tr></table></figure><br>那么这个函数，我们就可以把它叫作<code>length1</code>了，因为它可以正确求出长度小于等于1的list的长度！<br>那么，<code>length2</code>就再来一次啦，把<code>length1</code>丢进那个定义，也不需要显式使用<code>length2</code>啦！<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length2</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">  (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">      <span class="number">0</span></span><br><span class="line">      (<span class="name">add1</span> ((<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">               (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">                   <span class="number">0</span></span><br><span class="line">                   (<span class="name">add1</span> ((<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">                            (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">                                <span class="number">0</span></span><br><span class="line">                                (<span class="name">add1</span> (<span class="name">id</span> (<span class="name">rest</span> lst)))))</span><br><span class="line">                          (<span class="name">rest</span> lst)))))</span><br><span class="line">             (<span class="name">rest</span> lst)))))</span><br></pre></td></tr></table></figure><br>试一试<code>length2</code>！<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&gt; ((lambda (lst)</span><br><span class="line">   (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">       <span class="number">0</span></span><br><span class="line">       (<span class="name">add1</span> ((<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">                (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">                    <span class="number">0</span></span><br><span class="line">                    (<span class="name">add1</span> ((<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">                             (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">                                 <span class="number">0</span></span><br><span class="line">                                 (<span class="name">add1</span> (<span class="name">id</span> (<span class="name">rest</span> lst)))))</span><br><span class="line">                           (<span class="name">rest</span> lst)))))</span><br><span class="line">              (rest lst)))))</span><br><span class="line"> `(two apple))</span><br><span class="line"></span><br><span class="line"><span class="number">2</span></span><br></pre></td></tr></table></figure><br>真棒！现在能解决长度小于等于2的list了！<br>依此类推，我们能定义出<code>length3</code>、<code>length4</code>、<code>length5</code>,甚至<code>length100</code>、<code>length1000</code>、<code>length10000</code>了！<br>那么如果我们能写出<code>length∞</code>，不就得到了我们的原始<code>length</code>函数了吗，因为<code>length</code>是可以处理任意长度的list的函数！<br>但是，我们没办法写出<code>length∞</code>，因为无穷行代码哪里也放不下啊！（笑</p>
+<h3 id="试着进行抽象"><a href="#试着进行抽象" class="headerlink" title="试着进行抽象"></a>试着进行抽象</h3><p>试着观察<code>length0</code> <code>length1</code> <code>length2</code>，我们会发现，这三个函数都遵循相同的形式，只有<code>last-length</code>这个地方是需要改变的：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; same pattern</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst)))))</span><br></pre></td></tr></table></figure><br>根据DRY原则，我们为什么不把相同的形式给抽象出来呢？<br>我们可以写出一个函数，接受一个参数<code>last-length</code>，然后就可以利用这个函数生成之后的<code>length[i]</code>了。<br>就像这样：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; abstract-length</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br></pre></td></tr></table></figure><br>这个函数接受参数<code>last-length</code>,然后就会返回一个新的函数，可以比<code>last-length</code>多处理一个长度的list。<br>那么，<code>length0</code>可以表示为：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length0</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> (<span class="name">id</span>))</span><br></pre></td></tr></table></figure><br>那么同理，<code>length1</code>可以表示为：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length1</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> (<span class="name">length0</span>))</span><br></pre></td></tr></table></figure><br>当然，我们并没有<code>length0</code>,需要将其转换为匿名形式，也就是这样：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length1</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> ((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> (<span class="name">id</span>)))</span><br></pre></td></tr></table></figure><br>那么<code>length2</code>？<br>容易，再来一次：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length2</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> ((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> ((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> (<span class="name">id</span>))))</span><br></pre></td></tr></table></figure><br><strong>WAIT!!!!!!</strong>这难道不是依然在重复增加代码吗？<br>好吧，其实我们还是有所推进，别急，慢慢来。  </p>
+<h3 id="返回length函数的函数：make-length"><a href="#返回length函数的函数：make-length" class="headerlink" title="返回length函数的函数：make-length"></a>返回length函数的函数：make-length</h3><p>按照我们刚刚的抽象，<code>abstract-length</code>：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; abstract-length</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br></pre></td></tr></table></figure><br>对于这个函数，我们如果：</p>
+<ul>
+<li>喂给它<code>id</code>,即<code>(abstract-length id)</code>，那么它会返回<code>length0</code></li>
+<li>喂给它<code>length[i]</code>，即<code>(abstract-length length[i])</code>，那么它会返回<code>length[i+1]</code><br>既然这个函数能够返回我们需要的<code>length[i]</code>,不妨将其称之为<code>make-length</code>函数。<br>那就可以写成函数应用的形式，就像我们对<code>last-length</code>的抽象：<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length0</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> id))</span><br><span class="line"> abstract-length)</span><br></pre></td></tr></table></figure>
+依然运用我们的old trick，将<code>abstract-length</code>写成匿名形式：<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length0</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> id))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure>
+好了，虽然这个形式看上去很复杂，但是它就是我们熟悉的<code>length0</code>!<br>那么，<code>length1</code>呢？<br>很简单，我们只需要将<code>length0</code>喂给我们的<code>abstract-length</code>，就会得到<code>length1</code>。也就是将<code>length0</code>中的<code>id</code>替换成<code>length0</code>：<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length1</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> length0))</span><br><span class="line"> abstract-length)</span><br></pre></td></tr></table></figure>
+换成匿名表达：<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length1</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> (<span class="name">make-length</span> id)))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure>
+再进一步，<code>length2</code>：<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length2</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> (<span class="name">make-length</span> (<span class="name">make-length</span> id))))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure>
+那，<code>length3</code>？<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length3</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> (<span class="name">make-length</span> (<span class="name">make-length</span> (<span class="name">make-length</span> id)))))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure>
+好了好了，就不再继续演示了。<br>那么回顾一下我们的新表示方法，好像它们之间的差别，仅仅在于对参数<code>id</code>应用了多少次<code>make-length</code>函数：</li>
+<li><code>length0</code>: (make-length id)</li>
+<li><code>length1</code>: (make-length (make-length id))</li>
+<li><code>length2</code>: (make-length (make-length (make-length id)))</li>
+<li><code>length3</code>: (make-length (make-length (make-length (make-length id))))</li>
+</ul>
+<p>是不是有点类似汉诺塔？</p>
+<h3 id="快到终点了"><a href="#快到终点了" class="headerlink" title="快到终点了"></a>快到终点了</h3><p>事实上，每当我们使用<code>length</code>函数，我们并不会给它一个无限长的list。<br>那么，只要我们用一个足够大的<code>length[i]</code>，可不可行呢？按照我们上一小节的抽象，我们可以轻易地写出<code>length100</code>，甚至<code>length10000000000000000</code>。<br>问题在于，这个足够大的数，仍然可能不够大。  </p>
+<p>那么什么时候我们会知道，这个数不够大呢？<br>显然，当我们需要用到最最最最内层的函数<code>id</code>，也就是计算<code>(id (rest lst))</code>的时候，就代表，这个数不够大了。</p>
+<p><strong>注意：</strong>我们喂给<code>length2</code>一个长度小于等于2的list时，<code>id</code>的函数应用是没有求值的。</p>
+<p>那么，如果每当我们需要对<code>id</code>的函数应用求值的时候，我们再对其应用一次<code>make-length</code>，不就可以避免对<code>id</code>的函数应用求值了吗？</p>
+<p>那么，如果我们从不对<code>id</code>的函数应用求值，也就是说，<code>id</code>根本没什么用，我们可以把<strong>任意函数</strong>传递给最内层的<code>make-length</code>。</p>
+<p>那么，为何不试一试把<code>make-length</code>作为最内层的参数传给<code>make-length</code>呢。<br>那么，<code>length0</code>:<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length0</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure><br>回过头来看，其实<code>last-length</code>也是接受一个参数<code>length[i]</code>，然后返回新的函数<code>length[i+1]</code>。  </p>
+<p>那不是和<code>make-length</code>一样了？<br>是这样。<br>那我们将<code>last-length</code>改名为<code>make-length</code>也可以吗？<br>可以。只要保持函数参数和函数体内的名字一致即可。<br>那我们改名吧：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length0</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">make-length</span> (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure></p>
+<p>进一步，依照刚刚所说，我们只需要将<code>length1</code>中最内层的函数应用添加一层<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length1</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> ((<span class="name">make-length</span> id) (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure><br>等等？为什么<code>id</code>又出现了？<br>因为我们只能处理长度小于等于1的list。<br>如何解决此困境？<br>再次将<code>make-length</code>传递给自身，这样每当我们需要更长的<code>length[i]</code>的时候，就会自动将函数的处理能力+1。<br>就像这样：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length1</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> ((<span class="name">make-length</span> make-length) (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure></p>
+<p>这个函数的工作机理是，它展开的层数总是和喂给它的<code>list</code>长度一样多。因为一旦层数不够长，他就会将<code>make-length</code>应用于自身，增加多一次的处理。</p>
+<p>试一试<code>length1</code>能否工作:<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&gt; (((lambda (make-length)</span><br><span class="line">    (make-length make-length))</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">    (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">      (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">          <span class="number">0</span></span><br><span class="line">          (add1 ((make-length make-length) (rest lst)))))))</span><br><span class="line"> `(apple))</span><br><span class="line"></span><br><span class="line"> <span class="number">1</span></span><br><span class="line"></span><br><span class="line"> &gt; (((lambda (make-length)</span><br><span class="line">    (make-length make-length))</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">    (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">      (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">          <span class="number">0</span></span><br><span class="line">          (add1 ((make-length make-length) (rest lst)))))))</span><br><span class="line"> `(two apple))</span><br><span class="line"></span><br><span class="line"> <span class="number">2</span></span><br></pre></td></tr></table></figure></p>
+<p>很好，我们得到了一个能工作的<code>length1</code>，事实上，这已经不再是<code>length1</code>了，因为它能处理长度为2的list！甚至更长的！<br>这就和我们最初的<code>length</code>一样了！  </p>
+<p>（如果你不明白这里的<code>length1</code>为何能工作，可以试着再读一读这两个小节，或者手动推演一下这个lambda式子）</p>
+<h3 id="不止应用于length"><a href="#不止应用于length" class="headerlink" title="不止应用于length"></a>不止应用于length</h3><p>对比一下我们的显式递归<code>length</code>和<code>newlength</code>:<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length</span></span><br><span class="line">(<span class="name"><span class="builtin-name">define</span></span> length</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line"></span><br><span class="line"><span class="comment">; newlength</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> ((<span class="name">make-length</span> make-length) (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure></p>
+<p>这两个定义在形式上还是有差别，因为前者定义中的<code>(length (rest lst))</code>，在后者定义中变成了<code>((make-length make-length) (rest lst))</code>。  </p>
+<p>为了使它们表现的一致，我们将<code>(make-length make-length)</code>抽象出来就好了，然后作为参数传进去，而且我们将参数取名为<code>length</code>！</p>
+<figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length</span></span><br><span class="line">(<span class="name"><span class="builtin-name">define</span></span> length</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line"></span><br><span class="line"><span class="comment">; newlength</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   ((<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">    <span class="comment">;;;;;;;</span></span><br><span class="line">     (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">       (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">           <span class="number">0</span></span><br><span class="line">           (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line">    <span class="comment">;;;;;;;</span></span><br><span class="line">   (<span class="name">make-length</span> make-length))))</span><br></pre></td></tr></table></figure>
+<p>好了，看上去大功告成，可以把两个定义在形式上相同的地方抽象出来，这样就可以用在别的递归函数定义中了。  </p>
+<p>WAIT！还没完，我们试着用一用<code>newlength</code>，试着对<code>(apple)</code>求值：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; (((lambda (make-length)</span><br><span class="line">    (make-length make-length))</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">    ((<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">       (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">         (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">             <span class="number">0</span></span><br><span class="line">             (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line">     (make-length make-length))))</span><br><span class="line"> `(apple))</span><br></pre></td></tr></table></figure>
+<p>我们需要将这个表达式的值求出来，然后应用到<code>(apple)</code>上<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> <span class="comment">; A-start</span></span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   ((<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">      (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">        (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">            <span class="number">0</span></span><br><span class="line">            (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line">    (<span class="name">make-length</span> make-length)))</span><br><span class="line"> <span class="comment">; A-end</span></span><br><span class="line"> )</span><br><span class="line"> </span><br></pre></td></tr></table></figure></p>
+<p>首先我们需要将<code>(lambda (make-length) (make-length make-length))</code>应用于后面那个式子(记作A)上，得到<code>(A A)</code>，即：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">(</span><br><span class="line"> <span class="comment">; B-start</span></span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   ((<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">      (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">        (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">            <span class="number">0</span></span><br><span class="line">            (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line">    (<span class="name">make-length</span> make-length)))</span><br><span class="line"> <span class="comment">; B-end</span></span><br><span class="line"> <span class="comment">; C-start</span></span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   ((<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">      (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">        (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">            <span class="number">0</span></span><br><span class="line">            (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line">    (<span class="name">make-length</span> make-length)))</span><br><span class="line"> <span class="comment">; C-end</span></span><br><span class="line"> )</span><br></pre></td></tr></table></figure></p>
+<p>然后继续求值，将B应用于C，也就是将B的参数<code>make-length</code>用C进行代换，得到：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">(</span><br><span class="line"> <span class="comment">; D-start</span></span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> <span class="comment">; D-end</span></span><br><span class="line"> <span class="comment">; E-start</span></span><br><span class="line"> ((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">    ((<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">       (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">         (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">             <span class="number">0</span></span><br><span class="line">             (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line">     (<span class="name">make-length</span> make-length)))</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">    ((<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">       (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">         (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">             <span class="number">0</span></span><br><span class="line">             (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line">     (<span class="name">make-length</span> make-length))))</span><br><span class="line"> <span class="comment">; E-end</span></span><br><span class="line"> )</span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<p>现在我们得到了形如<code>(D E)</code>的式子，然后我们继续求值，你会注意到，E的形状和刚刚我们得到的<code>(A A)</code>形状是一样的，所以我们会在这里一直循环下去。  </p>
+<p>这就很奇怪了，我们在把<code>(make-length make-length)</code>抽象出来之前函数都是好的呀？  </p>
+<p>回想一下，<code>make-length</code>的作用是生成一个新的<code>length[i+1]</code>函数，然后将其应用于一个list。<br>但是我们把<code>(make-length make-length)</code>抽象出来之后，我们无法得到这个<code>length[i+1]</code>函数，因为Scheme是应用序求值策略，<code>make-length</code>反复对自身进行应用。<br>因此，我们要想一个办法，先让<code>make-length</code>的应用停一停，等到需要它对自身进行应用的时候，再继续。<br>这个方法并不复杂，就是将<code>(make-length make-length)</code>包裹在一个<code>lambda</code>表达式之中，即<code>(lambda (x) ((make-length make-length) x))</code>。<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; newlength</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> ((<span class="name"><span class="builtin-name">lambda</span></span> (x) ((<span class="name">make-length</span> make-length) x))</span><br><span class="line">                (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure></p>
+<p>然后我们再把它抽象出来。<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; new newlength</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (</span><br><span class="line">    <span class="comment">;;;;;;</span></span><br><span class="line">    (<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">      (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">        (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">            <span class="number">0</span></span><br><span class="line">            (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line">    <span class="comment">;;;;;;</span></span><br><span class="line">    (<span class="name"><span class="builtin-name">lambda</span></span> (x) ((<span class="name">make-length</span> make-length) x)))))</span><br><span class="line"></span><br><span class="line"><span class="comment">; length</span></span><br><span class="line">(<span class="name"><span class="builtin-name">define</span></span> length</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br></pre></td></tr></table></figure></p>
+<p>这样，我们就得能正确使用的<code>newlength</code>了，就能继续我们的抽象工作了。  </p>
+<p>对比一下<code>newlength</code>和原始<code>length</code>，使用“;;;;;;”分隔开的部分，完全就是原始<code>length</code>的定义，除了将原始<code>length</code>定义中的<code>define</code>替换成<code>lambda</code>。而且这部分，和<code>make-length</code>完全无关！</p>
+<p>那么，我们将这部分抽象出来，使其变成一个函数应用。<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">(</span><br><span class="line"> <span class="comment">; Y-start</span></span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (a-func)</span><br><span class="line">   ((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">      (<span class="name">make-length</span> make-length))</span><br><span class="line">    (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">      (<span class="name">a-func</span> (<span class="name"><span class="builtin-name">lambda</span></span> (x)</span><br><span class="line">                ((<span class="name">make-length</span> make-length) x))))))</span><br><span class="line"> <span class="comment">; Y-end</span></span><br><span class="line"> <span class="comment">; F-start</span></span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> <span class="comment">; F-end</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>现在我们有了两部分，Y和F：</p>
+<ul>
+<li>Y部分是一个函数，它接受一个和原始<code>length</code>具有相同形式的函数，然后返回一个递归函数<code>length</code>；</li>
+<li>F部分，就是和原始<code>length</code>形式相同的匿名函数啦。</li>
+</ul>
+<p>那么这个Y部分，就是我们的Y combinator！一般被称作应用序Y combinator。<br>化简一下：<br><figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; applicative-order Y combinator</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (func)</span><br><span class="line">  ((<span class="name"><span class="builtin-name">lambda</span></span> (f)</span><br><span class="line">     (<span class="name">f</span> f))</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (f)</span><br><span class="line">     (<span class="name">func</span> (<span class="name"><span class="builtin-name">lambda</span></span> (x)</span><br><span class="line">             ((<span class="name">f</span> f) x))))))</span><br></pre></td></tr></table></figure><br>有了Y combinator，我们就能从匿名函数中定义递归函数了！</p>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><p>你能写出一个简单的阶乘函数<code>factorial</code>，然后用Y combinator将其变成匿名递归函数吗？</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ol>
+<li><a href="https://www.amazon.com/Little-Schemer-Daniel-P-Friedman/dp/0262560992" target="_blank" rel="noopener"><em>The Little Schemer</em></a></li>
+<li><a href="https://en.wikipedia.org/wiki/Fixed-point_combinator" target="_blank" rel="noopener">Fixed-point combinator - Wikipidia</a></li>
+<li><a href="https://mitpress.mit.edu/sicp/full-text/sicp/book/node85.html" target="_blank" rel="noopener">Normal Order and Applicative Order - <em>SICP</em></a></li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/Scheme/" rel="tag"># Scheme</a>
+          
+            <a href="/tags/Y-combinator/" rel="tag"># Y combinator</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/13/PIHex10/" rel="next" title="Programming in Haskell Chapter10 Exercises Solutions">
+                <i class="fa fa-chevron-left"></i> Programming in Haskell Chapter10 Exercises Solutions
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/28/Monoid in Functional Programming/" rel="prev" title="Monoid in Functional Programming">
+                Monoid in Functional Programming <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  
+  <p class="site-author-name" itemprop="name">Yifu Duan</p>
+  <div class="site-description motion-element" itemprop="description">Contact me at me###duanyifu.com</div>
+</div>
+
+
+  <nav class="site-state motion-element">
+    
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span>
+        
+      </div>
+    
+
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+          
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是递归函数？"><span class="nav-number">2.</span> <span class="nav-text">什么是递归函数？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#假如length没有名字？"><span class="nav-number">3.</span> <span class="nav-text">假如length没有名字？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#length1-length2-and-…"><span class="nav-number">4.</span> <span class="nav-text">length1, length2, and …</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#试着进行抽象"><span class="nav-number">5.</span> <span class="nav-text">试着进行抽象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#返回length函数的函数：make-length"><span class="nav-number">6.</span> <span class="nav-text">返回length函数的函数：make-length</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快到终点了"><span class="nav-number">7.</span> <span class="nav-text">快到终点了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不止应用于length"><span class="nav-number">8.</span> <span class="nav-text">不止应用于length</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#练习"><span class="nav-number">9.</span> <span class="nav-text">练习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">10.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yifu Duan</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+</body>
+</html>
