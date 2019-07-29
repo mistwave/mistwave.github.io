@@ -107,7 +107,7 @@
 <meta property="og:site_name" content="Yifu&#39;s Blog">
 <meta property="og:description" content="Monoid 是什么？我们先看两组例子： 123456789// string concatenationconcat(&quot;foo&quot;,&quot;bar&quot;) == &quot;foobar&quot;concat(&quot;&quot;, &quot;latte&quot;) == concat(&quot;latte&quot;, &quot;&quot;) == &quot;latte&quot;concat(&quot;a&quot;, concat(&quot;b&quot;, &quot;c&quot;)) == concat(concat(&quot;a&quot;, &quot;b&quot;), &quot;c&quot;)">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-07-28T14:36:08.583Z">
+<meta property="og:updated_time" content="2019-07-29T02:10:05.742Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Monoid in Functional Programming">
 <meta name="twitter:description" content="Monoid 是什么？我们先看两组例子： 123456789// string concatenationconcat(&quot;foo&quot;,&quot;bar&quot;) == &quot;foobar&quot;concat(&quot;&quot;, &quot;latte&quot;) == concat(&quot;latte&quot;, &quot;&quot;) == &quot;latte&quot;concat(&quot;a&quot;, concat(&quot;b&quot;, &quot;c&quot;)) == concat(concat(&quot;a&quot;, &quot;b&quot;), &quot;c&quot;)">
@@ -331,13 +331,23 @@
                 
               
 
-              <time title="Created: 2019-07-28 19:31:56 / Modified: 22:36:08" itemprop="dateCreated datePublished" datetime="2019-07-28T19:31:56+08:00">2019-07-28</time>
+              <time title="Created: 2019-07-28 19:31:56" itemprop="dateCreated datePublished" datetime="2019-07-28T19:31:56+08:00">2019-07-28</time>
             </span>
           
 
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-29 10:10:05" itemprop="dateModified" datetime="2019-07-29T10:10:05+08:00">2019-07-29</time>
+              </span>
             
           
 
@@ -417,7 +427,7 @@
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>).foldLeft(<span class="number">0</span>)((x, y) =&gt; x + y) == </span><br><span class="line"><span class="type">List</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>).foldLeft(intAddtion.zero)(intAddtion.op)</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> intAddtionMonoid: <span class="type">Monoid</span>[<span class="type">Int</span>] = <span class="keyword">new</span> <span class="type">Monoid</span>[<span class="type">Int</span>] &#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">op</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>): <span class="type">Int</span> = x + y</span><br><span class="line">  <span class="keyword">override</span> <span class="keyword">val</span> zero: <span class="type">Int</span> = <span class="number">0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>所以可以写一个更加通用的函数，接收一个<code>List[A]</code>和一个<code>Monoid[A]</code>，并用这个monoid去折叠：</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">concatenate</span></span>[<span class="type">A</span>](as: <span class="type">List</span>[<span class="type">A</span>], m: <span class="type">Monoid</span>[<span class="type">A</span>]): <span class="type">A</span> = </span><br><span class="line">  as.foldLeft(m.zero)(m.op)</span><br></pre></td></tr></table></figure>
-<p>甚至可以将<code>List[A]</code> map 成<code>list[B]</code>：</p>
+<p>甚至可以将<code>List[A]</code> map 成<code>List[B]</code>：</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foldMap</span></span>[<span class="type">A</span>, <span class="type">B</span>](as: <span class="type">List</span>[<span class="type">A</span>], m: <span class="type">Monoid</span>[<span class="type">B</span>])(f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">B</span> = </span><br><span class="line">  as.foldLeft(m.zero)(b =&gt; a =&gt; m.op(b, f(a)))</span><br></pre></td></tr></table></figure>
 <h3 id="通用折叠"><a href="#通用折叠" class="headerlink" title="通用折叠"></a>通用折叠</h3><p>事实上，对于所有的可折叠数据结构，我们都可以忽略其具体结构，直接用monoid进行折叠。</p>
 <p>比如，我们有一个存放了<code>Int</code>的可折叠结构，计算其总和：</p>
