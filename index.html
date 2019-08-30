@@ -287,6 +287,181 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2019/08/30/variance/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yifu Duan">
+      <meta itemprop="description" content="Contact me at me###duanyifu.com">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yifu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/08/30/variance/" class="post-title-link" itemprop="url">浅谈covariance和contravariance</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-08-30 21:05:56 / Modified: 22:48:03" itemprop="dateCreated datePublished" datetime="2019-08-30T21:05:56+08:00">2019-08-30</time>
+            </span>
+          
+
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Programming/" itemprop="url" rel="index"><span itemprop="name">Programming</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="一些定义"><a class="header-anchor" href="#一些定义">¶</a>一些定义</h2>
+<p>考虑类型<code>A</code>和<code>C</code>，以及泛型构造器<code>F&lt;T&gt;</code>：</p>
+<ul>
+<li><strong>如果我们在一个需要<code>A</code>的地方，总能使用<code>C</code>，我们就可以说<code>C</code>是<code>A</code>的子类型（subtype）<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>，记作<code>C &lt;: A</code>。</strong></li>
+<li><strong>如果F是协变的（covariant），且<code>C &lt;: A</code>，则有<code>F&lt;C&gt; &lt;: F&lt;A&gt;</code>。</strong></li>
+<li><strong>如果F是逆变的（contravariant），且<code>C &lt;: A</code>，则有<code>F&lt;A&gt; &lt;: F&lt;C&gt;</code>。</strong></li>
+<li><strong>如果F是不变的（invariant），无论<code>A</code>与<code>C</code>是什么关系，<code>F&lt;C&gt;</code> 与 <code>F&lt;A&gt;</code>都没有关系。</strong></li>
+</ul>
+<h2 id="collection视角"><a class="header-anchor" href="#collection视角">¶</a>Collection视角</h2>
+<p>先举用例子来看看Collection的型变规则。</p>
+<p><code>Duck</code>是<code>Bird</code>的子类，<code>Bird</code>是<code>Animal</code>的子类，记作<code>Duck &lt;: Bird &lt;: Animal</code>。</p>
+<p>TypeScript中的<code>Array</code>是协变的（covariant）：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> Animal &#123; name: <span class="built_in">String</span> &#125;</span><br><span class="line"><span class="keyword">interface</span> Bird <span class="keyword">extends</span> Animal &#123;</span><br><span class="line">    <span class="comment">// not all animals can fly</span></span><br><span class="line">    fly: <span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">String</span> </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">interface</span> Duck <span class="keyword">extends</span> Bird &#123;</span><br><span class="line">    <span class="comment">// not all birds can swim</span></span><br><span class="line">    swim: <span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">String</span> </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> aDog: Animal = &#123;</span><br><span class="line">    name: <span class="string">""</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> aBird: Bird = &#123;</span><br><span class="line">    name: <span class="string">"Owl"</span>,</span><br><span class="line">    fly: <span class="function"><span class="params">()</span> =&gt;</span> name + <span class="string">" is flying!"</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> aDuck: Duck = &#123;</span><br><span class="line">    name: <span class="string">"Donald"</span>, </span><br><span class="line">    fly: <span class="function"><span class="params">()</span> =&gt;</span> name + <span class="string">" is flying!"</span>,</span><br><span class="line">    swim: <span class="function"><span class="params">()</span> =&gt;</span> name + <span class="string">" is swiming!"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Legal; Array is covariant, expecting an Array&lt;Animal&gt;, given an Array&lt;Bird&gt; </span></span><br><span class="line"><span class="keyword">const</span> animals: <span class="built_in">Array</span>&lt;Animal&gt; = [aDuck, aBird]; </span><br><span class="line"><span class="comment">// Illegal; expecting an Array&lt;Bird&gt;, given an Array&lt;Animal&gt;</span></span><br><span class="line"><span class="keyword">const</span> birds: <span class="built_in">Array</span>&lt;Bird&gt; = [aDuck, aDog];</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/08/30/variance/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2019/07/28/monoid-in-FP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1861,174 +2036,6 @@
   </article>
 
     
-        
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2016/08/24/write-haskell-with-sublime/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yifu Duan">
-      <meta itemprop="description" content="Contact me at me###duanyifu.com">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yifu's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2016/08/24/write-haskell-with-sublime/" class="post-title-link" itemprop="url">用Sublime Text写Haskell</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-
-          
-          
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2016-08-24 02:09:20 / Modified: 04:00:47" itemprop="dateCreated datePublished" datetime="2016-08-24T02:09:20+08:00">2016-08-24</time>
-            </span>
-          
-
-          
-            
-
-            
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Haskell/" itemprop="url" rel="index"><span itemprop="name">Haskell</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-          
-
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h3 id="基础准备"><a href="#基础准备" class="headerlink" title="基础准备"></a>基础准备</h3><ul>
-<li><a href="https://www.haskell.org/downloads" target="_blank" rel="noopener">Haskell</a> (我选择的是Haskell Platform 8.0.1)</li>
-<li><a href="https://www.sublimetext.com/3" target="_blank" rel="noopener">Sublime Text</a></li>
-<li><a href="https://packagecontrol.io/installation" target="_blank" rel="noopener">Package Control: The Sublime Text package manager</a></li>
-</ul>
-<h3 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h3><h4 id="SublimeHaskell"><a href="#SublimeHaskell" class="headerlink" title="SublimeHaskell"></a>SublimeHaskell</h4><p>在Package Control中安装SublimeHaskell。<br>插件安装完成后，重启Sublime报错，提示需要安装hsdev cabal package。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SublimeHaskell: hsdev executable couldn&apos;t be found!</span><br><span class="line">It&apos;s used in most features of SublimeHaskell</span><br><span class="line">Check if it&apos;s installed and in PATH</span><br><span class="line">If it&apos;s not installed, run &apos;cabal install hsdev&apos; to install hsdev</span><br><span class="line">You may also want to adjust &apos;add_to_PATH&apos; setting</span><br></pre></td></tr></table></figure></p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2016/08/24/write-haskell-with-sublime/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
   </section>
 
   
@@ -2076,7 +2083,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -2136,7 +2143,11 @@
         
           
         
-        <span class="site-state-item-count">11</span>
+          
+        
+          
+        
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">tags</span>
         
       </div>

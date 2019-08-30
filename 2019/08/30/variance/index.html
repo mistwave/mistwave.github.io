@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="¶一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
+<meta name="keywords" content="Functional Programming,Java,TypeScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈covariance和contravariance">
+<meta property="og:url" content="http://duanyifu.com/2019/08/30/variance/index.html">
+<meta property="og:site_name" content="Yifu&#39;s Blog">
+<meta property="og:description" content="¶一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-30T14:48:03.225Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈covariance和contravariance">
+<meta name="twitter:description" content="¶一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Yifu's Blog" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="http://duanyifu.com/2019/08/30/variance/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  
+  <title>浅谈covariance和contravariance | Yifu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yifu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2019/08/30/variance/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yifu Duan">
+      <meta itemprop="description" content="Contact me at me###duanyifu.com">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yifu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">浅谈covariance和contravariance
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-08-30 21:05:56 / Modified: 22:48:03" itemprop="dateCreated datePublished" datetime="2019-08-30T21:05:56+08:00">2019-08-30</time>
+            </span>
+          
+
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Programming/" itemprop="url" rel="index"><span itemprop="name">Programming</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一些定义"><a class="header-anchor" href="#一些定义">¶</a>一些定义</h2>
+<p>考虑类型<code>A</code>和<code>C</code>，以及泛型构造器<code>F&lt;T&gt;</code>：</p>
+<ul>
+<li><strong>如果我们在一个需要<code>A</code>的地方，总能使用<code>C</code>，我们就可以说<code>C</code>是<code>A</code>的子类型（subtype）<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>，记作<code>C &lt;: A</code>。</strong></li>
+<li><strong>如果F是协变的（covariant），且<code>C &lt;: A</code>，则有<code>F&lt;C&gt; &lt;: F&lt;A&gt;</code>。</strong></li>
+<li><strong>如果F是逆变的（contravariant），且<code>C &lt;: A</code>，则有<code>F&lt;A&gt; &lt;: F&lt;C&gt;</code>。</strong></li>
+<li><strong>如果F是不变的（invariant），无论<code>A</code>与<code>C</code>是什么关系，<code>F&lt;C&gt;</code> 与 <code>F&lt;A&gt;</code>都没有关系。</strong></li>
+</ul>
+<h2 id="collection视角"><a class="header-anchor" href="#collection视角">¶</a>Collection视角</h2>
+<p>先举用例子来看看Collection的型变规则。</p>
+<p><code>Duck</code>是<code>Bird</code>的子类，<code>Bird</code>是<code>Animal</code>的子类，记作<code>Duck &lt;: Bird &lt;: Animal</code>。</p>
+<p>TypeScript中的<code>Array</code>是协变的（covariant）：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> Animal &#123; name: <span class="built_in">String</span> &#125;</span><br><span class="line"><span class="keyword">interface</span> Bird <span class="keyword">extends</span> Animal &#123;</span><br><span class="line">    <span class="comment">// not all animals can fly</span></span><br><span class="line">    fly: <span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">String</span> </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">interface</span> Duck <span class="keyword">extends</span> Bird &#123;</span><br><span class="line">    <span class="comment">// not all birds can swim</span></span><br><span class="line">    swim: <span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">String</span> </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> aDog: Animal = &#123;</span><br><span class="line">    name: <span class="string">""</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> aBird: Bird = &#123;</span><br><span class="line">    name: <span class="string">"Owl"</span>,</span><br><span class="line">    fly: <span class="function"><span class="params">()</span> =&gt;</span> name + <span class="string">" is flying!"</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">const</span> aDuck: Duck = &#123;</span><br><span class="line">    name: <span class="string">"Donald"</span>, </span><br><span class="line">    fly: <span class="function"><span class="params">()</span> =&gt;</span> name + <span class="string">" is flying!"</span>,</span><br><span class="line">    swim: <span class="function"><span class="params">()</span> =&gt;</span> name + <span class="string">" is swiming!"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Legal; Array is covariant, expecting an Array&lt;Animal&gt;, given an Array&lt;Bird&gt; </span></span><br><span class="line"><span class="keyword">const</span> animals: <span class="built_in">Array</span>&lt;Animal&gt; = [aDuck, aBird]; </span><br><span class="line"><span class="comment">// Illegal; expecting an Array&lt;Bird&gt;, given an Array&lt;Animal&gt;</span></span><br><span class="line"><span class="keyword">const</span> birds: <span class="built_in">Array</span>&lt;Bird&gt; = [aDuck, aDog];</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>函数传入参数同样遵循这个规则：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">birdsFly</span>(<span class="params">birds: <span class="built_in">Array</span>&lt;Bird&gt;</span>) </span>&#123;</span><br><span class="line">    birds.forEach(<span class="function"><span class="params">b</span> =&gt;</span> b.fly())</span><br><span class="line">&#125;</span><br><span class="line">birdsFly(animals) <span class="comment">// Illegal</span></span><br><span class="line">birdsFly(birds) <span class="comment">// Legal, type matches</span></span><br><span class="line">birdsFly(ducks) <span class="comment">// Legal, Array&lt;Duck&gt; &lt;: Array&lt;Bird&gt;</span></span><br></pre></td></tr></table></figure>
+<p>默认情况下，Java的<code>List</code>是不变的（invariant）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Bird&gt; birds = <span class="keyword">new</span> ArrayList&lt;Duck&gt;(); <span class="comment">// Illegal</span></span><br><span class="line">List&lt;Bird&gt; birds = <span class="keyword">new</span> ArrayList&lt;Bird&gt;(); <span class="comment">// Legal</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">birdsFly</span><span class="params">(List&lt;Bird&gt; birds)</span> </span>&#123;...&#125;</span><br><span class="line"></span><br><span class="line">birdsFly(animals); <span class="comment">// Illegal</span></span><br><span class="line">birdsFly(birds); <span class="comment">// Legal</span></span><br><span class="line">birdsFly(ducks); <span class="comment">// Illegal</span></span><br></pre></td></tr></table></figure>
+<p>当然，我们可以用bounded wildcards在使用时去除不变性：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">List&lt;? extends Bird&gt; coList = <span class="keyword">new</span> ArrayList&lt;Duck&gt;(); <span class="comment">// Legal; covariant</span></span><br><span class="line">List&lt;? <span class="keyword">super</span> Bird&gt; contraList = <span class="keyword">new</span> ArrayList&lt;Animal&gt;(); <span class="comment">// Legal; contravariant</span></span><br></pre></td></tr></table></figure>
+<p><em>Effective Java</em>中提到的PECS（producer extends，consumer super），就是说，如果你接收一个Collection：</p>
+<ul>
+<li>只读其中的元素（Collection是producer），那么你最好接受一个协变的Collection；</li>
+<li>反之，如果你只写入<code>List</code>（Collection是consumer），那么你最好接受一个逆变的Collection。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">namesOfBirds</span><span class="params">(List&lt;? extends Bird&gt; birds)</span> </span>&#123;</span><br><span class="line">  birds.forEach(bird -&gt; System.out.println(bird.getName()));</span><br><span class="line">&#125;</span><br><span class="line">namesOfBird(ducks); <span class="comment">// Legal; covariant</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addAOwl</span><span class="params">(List&lt;? <span class="keyword">super</span> Bird&gt; birds)</span> </span>&#123;</span><br><span class="line">  Bird aOwl = <span class="keyword">new</span> Bird(<span class="string">"owl"</span>);</span><br><span class="line">  birds.add(aOwl);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// It is natural to add a owl into a List&lt;Animal&gt;</span></span><br><span class="line">addAOwl(animals) <span class="comment">// Legal; contravariant</span></span><br></pre></td></tr></table></figure>
+<h2 id="function-type"><a class="header-anchor" href="#function-type">¶</a>Function Type</h2>
+<p>容器类型的型变其实是比较符合直觉的，函数类型就很反直觉了。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Function1</span>[-<span class="type">T1</span>, +<span class="type">R</span>]</span></span><br></pre></td></tr></table></figure>
+<p>这是Scala标准库定义的单参函数的trait（可以理解为interface），类型为<code>T1 -&gt; R</code>，其中<code>T1</code>是逆变的，<code>R</code>是协变的<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>。</p>
+<p>But why？？？</p>
+<p>回想一下，型变规则决定了我们能使用什么样的子类型，<strong>子类型决定了我们能在一个期望X的地方，安全地使用另一个类型Y</strong>（X的子类型）。</p>
+<p>So，既然函数类型也是一种类型，我们当然也要知道函数类型的子类型咯，对吧？</p>
+<p>那么对于函数类型<code>Bird -&gt; Bird</code>，根据trait定义，<code>Animal -&gt; Duck</code>就是它的子类型。</p>
+<p>Weird, right?</p>
+<p>假设我们有高阶函数<code>f: (Bird -&gt; Bird) -&gt; String</code>，接受一个函数参数<code>g</code>，返回<code>String</code>（返回什么我们并不关心）。</p>
+<ol>
+<li>
+<p>如果参数类型协变，有<code>g: Duck -&gt; Bird</code>，<code>f(g)</code>会怎样？</p>
+<p><code>f</code>已知<code>g</code>接受<code>Bird</code>，于是<code>f</code>调用<code>g</code>的时候，传给<code>g</code>一个<code>Bird</code>。</p>
+<p>然而，<code>g</code>只能处理<code>Bird</code>的一个子类型<code>Duck</code>，如果接收到一个<code>Swan</code>，<code>g</code>会崩溃。</p>
+<p>所以参数类型不可以协变。</p>
+</li>
+<li>
+<p>如果返回类型逆变，有<code>g: Bird -&gt; Animal</code>，<code>f(g)</code>会怎样？</p>
+<p><code>f</code>已知<code>g</code>返回<code>Bird</code>，于是<code>f</code>会将<code>g</code>的返回值当作<code>Bird</code>来使用。</p>
+<p>但是现在<code>g</code>会返回一个不是<code>Bird</code>的<code>Animal</code>，比如<code>Dog</code>，那么<code>f</code>会崩溃。</p>
+<p>所以返回类型不可以逆变。</p>
+</li>
+<li>
+<p>如果<code>g: Animal -&gt; Duck</code>，<code>f(g)</code>又如何呢：</p>
+<p><code>f</code>已知<code>g</code>接收<code>Bird</code>，所以传给<code>g</code>一个<code>Bird</code>，<code>g</code>可以正常处理<code>Bird</code>并返回<code>Duck</code>，没有问题。</p>
+<p><code>f</code>已知<code>g</code>返回<code>Bird</code>，所以将<code>g</code>返回的<code>Duck</code>当作<code>Bird</code>来用，所有<code>Duck</code>都是<code>Bird</code>，也没问题。</p>
+</li>
+</ol>
+<p>所以，在一个期望<code>(Bird -&gt; Bird)</code>的地方，我们总是可以使用<code>(Animal -&gt; Duck)</code>。</p>
+<p>即<code>(Animal -&gt; Duck) &lt;: (Bird -&gt; Bird)</code>。</p>
+<p>可以这样说：<strong>对于函数p和q，当p的参数更general，返回值更specific时，p可以安全地替代q</strong>。</p>
+<h2 id="references"><a class="header-anchor" href="#references">¶</a>References</h2>
+<ol>
+<li><a href="https://www.stephanboyer.com/post/132/what-are-covariance-and-contravariance" target="_blank" rel="noopener">What are covariance and contravariance?</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)" target="_blank" rel="noopener">Covariance and contravariance (computer science)</a></li>
+<li><a href="https://medium.com/@michalskoczylas/covariance-contravariance-and-a-little-bit-of-typescript-2e61f41f6f68" target="_blank" rel="noopener">Covariance, contravariance and a little bit of TypeScript</a></li>
+<li><a href="https://briangordon.github.io/2014/09/covariance-and-contravariance.html" target="_blank" rel="noopener">Covariance and contravariance rules in Java</a></li>
+<li><a href="https://docs.scala-lang.org/tour/variances.html" target="_blank" rel="noopener">Variances - <em>Tour of Scala</em></a></li>
+<li><a href="https://bartoszmilewski.com/2015/02/03/functoriality/" target="_blank" rel="noopener">Functoriality - <em>Categories for Programmers</em></a></li>
+</ol>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>需要注意的是，子类（subclass）和子类型（subtype）不是一回事。 <a href="#fnref1" class="footnote-backref">↩</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>Scala中，<code>F[+A]</code>代表协变，<code>F[-A]</code>代表逆变，<code>F[A]</code>代表不变。 <a href="#fnref2" class="footnote-backref">↩</a></p>
+</li>
+</ol>
+</section>
+
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/Functional-Programming/" rel="tag"># Functional Programming</a>
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/TypeScript/" rel="tag"># TypeScript</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/28/monoid-in-FP/" rel="next" title="Monoid in Functional Programming">
+                <i class="fa fa-chevron-left"></i> Monoid in Functional Programming
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  
+  <p class="site-author-name" itemprop="name">Yifu Duan</p>
+  <div class="site-description motion-element" itemprop="description">Contact me at me###duanyifu.com</div>
+</div>
+
+
+  <nav class="site-state motion-element">
+    
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span>
+        
+      </div>
+    
+
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+          
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一些定义"><span class="nav-number">1.</span> <span class="nav-text">¶一些定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#collection视角"><span class="nav-number">2.</span> <span class="nav-text">¶Collection视角</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#function-type"><span class="nav-number">3.</span> <span class="nav-text">¶Function Type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#references"><span class="nav-number">4.</span> <span class="nav-text">¶References</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yifu Duan</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+</body>
+</html>
