@@ -99,18 +99,18 @@
   };
 </script>
 
-  <meta name="description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  给算数表达式加上括号按照运算符优先级就可以，略过。 修改代码，使之正确将length xs用括号括起来即可。 尝试定义lastlast: 返回非空list的最后一个元素1mylast a = a !! ((length a) - 1) 尝试定义ini">
+  <meta name="description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  ¶给算数表达式加上括号 按照运算符优先级就可以，略过。 ¶修改代码，使之正确 将length xs用括号括起来即可。 ¶尝试定义last last: 返回非空list的最后一个元素 1mylast a = a !! ((length a) - 1)">
 <meta name="keywords" content="Haskell,Programming in Haskell">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Programming in Haskell Chapter2 Exercises Solutions">
 <meta property="og:url" content="http://duanyifu.com/2016/08/23/PIHex2/index.html">
 <meta property="og:site_name" content="Yifu&#39;s Blog">
-<meta property="og:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  给算数表达式加上括号按照运算符优先级就可以，略过。 修改代码，使之正确将length xs用括号括起来即可。 尝试定义lastlast: 返回非空list的最后一个元素1mylast a = a !! ((length a) - 1) 尝试定义ini">
+<meta property="og:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  ¶给算数表达式加上括号 按照运算符优先级就可以，略过。 ¶修改代码，使之正确 将length xs用括号括起来即可。 ¶尝试定义last last: 返回非空list的最后一个元素 1mylast a = a !! ((length a) - 1)">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2016-08-28T15:47:58.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Programming in Haskell Chapter2 Exercises Solutions">
-<meta name="twitter:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  给算数表达式加上括号按照运算符优先级就可以，略过。 修改代码，使之正确将length xs用括号括起来即可。 尝试定义lastlast: 返回非空list的最后一个元素1mylast a = a !! ((length a) - 1) 尝试定义ini">
+<meta name="twitter:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  ¶给算数表达式加上括号 按照运算符优先级就可以，略过。 ¶修改代码，使之正确 将length xs用括号括起来即可。 ¶尝试定义last last: 返回非空list的最后一个元素 1mylast a = a !! ((length a) - 1)">
 
 
 
@@ -405,10 +405,16 @@
       
         <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="给算数表达式加上括号"><a href="#给算数表达式加上括号" class="headerlink" title="给算数表达式加上括号"></a>给算数表达式加上括号</h4><p>按照运算符优先级就可以，略过。</p>
-<h4 id="修改代码，使之正确"><a href="#修改代码，使之正确" class="headerlink" title="修改代码，使之正确"></a>修改代码，使之正确</h4><p>将<code>length xs</code>用括号括起来即可。</p>
-<h4 id="尝试定义last"><a href="#尝试定义last" class="headerlink" title="尝试定义last"></a>尝试定义<code>last</code></h4><p><code>last</code>: 返回非空list的最后一个元素<br><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">mylast</span> a = a !! ((length a) - <span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
-<h4 id="尝试定义init"><a href="#尝试定义init" class="headerlink" title="尝试定义init"></a>尝试定义<code>init</code></h4><p><code>init</code>: 删除非空list的最后一个元素，并返回list<br><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">myinit1</span> a = take ((length a) - <span class="number">1</span>) a</span><br><span class="line"></span><br><span class="line"><span class="title">myinit2</span> a = <span class="keyword">let</span> n = length a <span class="keyword">in</span> reverse (tail (reverse a))</span><br></pre></td></tr></table></figure></p>
+<h4 id="给算数表达式加上括号"><a class="header-anchor" href="#给算数表达式加上括号">¶</a>给算数表达式加上括号</h4>
+<p>按照运算符优先级就可以，略过。</p>
+<h4 id="修改代码-使之正确"><a class="header-anchor" href="#修改代码-使之正确">¶</a>修改代码，使之正确</h4>
+<p>将<code>length xs</code>用括号括起来即可。</p>
+<h4 id="尝试定义last"><a class="header-anchor" href="#尝试定义last">¶</a>尝试定义<code>last</code></h4>
+<p><code>last</code>: 返回非空list的最后一个元素</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">mylast</span> a = a !! ((length a) - <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<h4 id="尝试定义init"><a class="header-anchor" href="#尝试定义init">¶</a>尝试定义<code>init</code></h4>
+<p><code>init</code>: 删除非空list的最后一个元素，并返回list</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">myinit1</span> a = take ((length a) - <span class="number">1</span>) a</span><br><span class="line"></span><br><span class="line"><span class="title">myinit2</span> a = <span class="keyword">let</span> n = length a <span class="keyword">in</span> reverse (tail (reverse a))</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -639,7 +645,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#给算数表达式加上括号"><span class="nav-number">1.</span> <span class="nav-text">给算数表达式加上括号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改代码，使之正确"><span class="nav-number">2.</span> <span class="nav-text">修改代码，使之正确</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#尝试定义last"><span class="nav-number">3.</span> <span class="nav-text">尝试定义last</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#尝试定义init"><span class="nav-number">4.</span> <span class="nav-text">尝试定义init</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#给算数表达式加上括号"><span class="nav-number">1.</span> <span class="nav-text">¶给算数表达式加上括号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改代码-使之正确"><span class="nav-number">2.</span> <span class="nav-text">¶修改代码，使之正确</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#尝试定义last"><span class="nav-number">3.</span> <span class="nav-text">¶尝试定义last</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#尝试定义init"><span class="nav-number">4.</span> <span class="nav-text">¶尝试定义init</span></a></li></ol></div>
             
 
           </div>

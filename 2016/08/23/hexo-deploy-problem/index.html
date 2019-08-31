@@ -99,18 +99,18 @@
   };
 </script>
 
-  <meta name="description" content="问题描述用hexo d命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。 1234567▶ hexo dINFO  Deploying: gitINFO  Clearing .deploy_git folder...INFO  Copying files from public folder...On branch masternothing to commit, w">
+  <meta name="description" content="¶问题描述 用hexo d命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。 1234567▶ hexo dINFO  Deploying: gitINFO  Clearing .deploy_git folder...INFO  Copying files from public folder...On branch masternothing to commit,">
 <meta name="keywords" content="hexo,git,shadowsocks">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hexo deploy 命令卡住的奇怪问题">
 <meta property="og:url" content="http://duanyifu.com/2016/08/23/hexo-deploy-problem/index.html">
 <meta property="og:site_name" content="Yifu&#39;s Blog">
-<meta property="og:description" content="问题描述用hexo d命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。 1234567▶ hexo dINFO  Deploying: gitINFO  Clearing .deploy_git folder...INFO  Copying files from public folder...On branch masternothing to commit, w">
+<meta property="og:description" content="¶问题描述 用hexo d命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。 1234567▶ hexo dINFO  Deploying: gitINFO  Clearing .deploy_git folder...INFO  Copying files from public folder...On branch masternothing to commit,">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2016-08-22T18:56:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hexo deploy 命令卡住的奇怪问题">
-<meta name="twitter:description" content="问题描述用hexo d命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。 1234567▶ hexo dINFO  Deploying: gitINFO  Clearing .deploy_git folder...INFO  Copying files from public folder...On branch masternothing to commit, w">
+<meta name="twitter:description" content="¶问题描述 用hexo d命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。 1234567▶ hexo dINFO  Deploying: gitINFO  Clearing .deploy_git folder...INFO  Copying files from public folder...On branch masternothing to commit,">
 
 
 
@@ -393,18 +393,24 @@
       
 
       
-        <h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>用<code>hexo d</code>命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。</p>
+        <h3 id="问题描述"><a class="header-anchor" href="#问题描述">¶</a>问题描述</h3>
+<p>用<code>hexo d</code>命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">▶ hexo d</span><br><span class="line">INFO  Deploying: git</span><br><span class="line">INFO  Clearing .deploy_git folder...</span><br><span class="line">INFO  Copying files from public folder...</span><br><span class="line">On branch master</span><br><span class="line">nothing to commit, working directory clean</span><br><span class="line">^CINFO  Bye!</span><br></pre></td></tr></table></figure>
 <a id="more"></a>
 <p><code>hexo d -debug</code>查看日志发现信息一直在循环</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">▶ hexo deploy -debug</span><br><span class="line">INFO  Start processing</span><br><span class="line">INFO  Files loaded in 620 ms</span><br><span class="line">INFO  0 files generated in 518 ms</span><br><span class="line">INFO  Start processing</span><br><span class="line">INFO  Files loaded in 468 ms</span><br><span class="line">INFO  0 files generated in 363 ms</span><br><span class="line">INFO  Start processing</span><br><span class="line">INFO  Files loaded in 342 ms</span><br><span class="line">...</span><br><span class="line">INFO  Start processing</span><br><span class="line">INFO  Files loaded in 274 ms</span><br><span class="line">INFO  0 files generated in 381 ms</span><br><span class="line">INFO  Start processing</span><br><span class="line">^CINFO  Bye!</span><br></pre></td></tr></table></figure>
-<h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p>首先检查_config.yml文件，看看deployment相关配置写对了没</p>
+<h3 id="解决办法"><a class="header-anchor" href="#解决办法">¶</a>解决办法</h3>
+<p>首先检查_config.yml文件，看看deployment相关配置写对了没</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Deployment</span><br><span class="line">## Docs: https://hexo.io/docs/deployment.html</span><br><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: git@github.com:mistwave/mistwave.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
-<p>对照官方文档后，发现配置并没有错，推测是ssh的问题。<br>将repo改成https地址后，问题依旧存在。</p>
+<p>对照官方文档后，发现配置并没有错，推测是ssh的问题。<br>
+将repo改成https地址后，问题依旧存在。</p>
 <p>找了一些类似问题的资料后，尝试了删除<code>.deploy_git</code>，更新git版本后，问题依然没有解决。</p>
 <p>但是在删除<code>.deploy_git</code>后，发现总是在gitlog后面卡住，推测是<code>git push</code>的问题，尝试让git走代理，问题解决，令人哭笑不得。</p>
-<p>git配置如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global http.proxy &apos;socks5://127.0.0.1:1080&apos;</span><br><span class="line">git config --global https.proxy &apos;socks5://127.0.0.1:1080&apos;</span><br></pre></td></tr></table></figure><br>设置的意思是让http/https协议走代理，即Shadowsocks的本地代理。</p>
-<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><ol>
+<p>git配置如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global http.proxy &apos;socks5://127.0.0.1:1080&apos;</span><br><span class="line">git config --global https.proxy &apos;socks5://127.0.0.1:1080&apos;</span><br></pre></td></tr></table></figure>
+<p>设置的意思是让http/https协议走代理，即Shadowsocks的本地代理。</p>
+<h3 id="参考文章"><a class="header-anchor" href="#参考文章">¶</a>参考文章</h3>
+<ol>
 <li><a href="https://github.com/hexojs/hexo/issues/1478" target="_blank" rel="noopener">hexo repo上一个类似issues</a></li>
 <li><a href="http://www.wuliaole.com/post/the_lag_problem_for_hexo_deploying_on_github/" target="_blank" rel="noopener">hexo在github部署卡住的奇怪问题</a></li>
 <li><a href="http://droidyue.com/blog/2016/04/04/set-shadowsocks-proxy-for-terminal/index.html" target="_blank" rel="noopener">为终端设置Shadowsocks代理</a></li>
@@ -642,7 +648,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决办法"><span class="nav-number">2.</span> <span class="nav-text">解决办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文章"><span class="nav-number">3.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">¶问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决办法"><span class="nav-number">2.</span> <span class="nav-text">¶解决办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文章"><span class="nav-number">3.</span> <span class="nav-text">¶参考文章</span></a></li></ol></div>
             
 
           </div>

@@ -107,7 +107,7 @@
 <meta property="og:site_name" content="Yifu&#39;s Blog">
 <meta property="og:description" content="¶一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-08-30T14:48:03.225Z">
+<meta property="og:updated_time" content="2019-08-31T09:19:04.925Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="浅谈covariance和contravariance">
 <meta name="twitter:description" content="¶一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
@@ -331,13 +331,23 @@
                 
               
 
-              <time title="Created: 2019-08-30 21:05:56 / Modified: 22:48:03" itemprop="dateCreated datePublished" datetime="2019-08-30T21:05:56+08:00">2019-08-30</time>
+              <time title="Created: 2019-08-30 21:05:56" itemprop="dateCreated datePublished" datetime="2019-08-30T21:05:56+08:00">2019-08-30</time>
             </span>
           
 
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-08-31 17:19:04" itemprop="dateModified" datetime="2019-08-31T17:19:04+08:00">2019-08-31</time>
+              </span>
             
           
 
@@ -429,28 +439,22 @@
 <p>那么对于函数类型<code>Bird -&gt; Bird</code>，根据trait定义，<code>Animal -&gt; Duck</code>就是它的子类型。</p>
 <p>Weird, right?</p>
 <p>假设我们有高阶函数<code>f: (Bird -&gt; Bird) -&gt; String</code>，接受一个函数参数<code>g</code>，返回<code>String</code>（返回什么我们并不关心）。</p>
-<ol>
-<li>
-<p>如果参数类型协变，有<code>g: Duck -&gt; Bird</code>，<code>f(g)</code>会怎样？</p>
+<p><strong>1. 如果参数类型协变，有<code>g: Duck -&gt; Bird</code>，<code>f(g)</code>会怎样？</strong></p>
 <p><code>f</code>已知<code>g</code>接受<code>Bird</code>，于是<code>f</code>调用<code>g</code>的时候，传给<code>g</code>一个<code>Bird</code>。</p>
 <p>然而，<code>g</code>只能处理<code>Bird</code>的一个子类型<code>Duck</code>，如果接收到一个<code>Swan</code>，<code>g</code>会崩溃。</p>
 <p>所以参数类型不可以协变。</p>
-</li>
-<li>
-<p>如果返回类型逆变，有<code>g: Bird -&gt; Animal</code>，<code>f(g)</code>会怎样？</p>
+<p><strong>2. 如果返回类型逆变，有<code>g: Bird -&gt; Animal</code>，<code>f(g)</code>会怎样？</strong></p>
 <p><code>f</code>已知<code>g</code>返回<code>Bird</code>，于是<code>f</code>会将<code>g</code>的返回值当作<code>Bird</code>来使用。</p>
 <p>但是现在<code>g</code>会返回一个不是<code>Bird</code>的<code>Animal</code>，比如<code>Dog</code>，那么<code>f</code>会崩溃。</p>
 <p>所以返回类型不可以逆变。</p>
-</li>
-<li>
-<p>如果<code>g: Animal -&gt; Duck</code>，<code>f(g)</code>又如何呢：</p>
+<p><strong>3. 如果<code>g: Animal -&gt; Duck</code>，<code>f(g)</code>又如何呢：</strong></p>
 <p><code>f</code>已知<code>g</code>接收<code>Bird</code>，所以传给<code>g</code>一个<code>Bird</code>，<code>g</code>可以正常处理<code>Bird</code>并返回<code>Duck</code>，没有问题。</p>
 <p><code>f</code>已知<code>g</code>返回<code>Bird</code>，所以将<code>g</code>返回的<code>Duck</code>当作<code>Bird</code>来用，所有<code>Duck</code>都是<code>Bird</code>，也没问题。</p>
-</li>
-</ol>
 <p>所以，在一个期望<code>(Bird -&gt; Bird)</code>的地方，我们总是可以使用<code>(Animal -&gt; Duck)</code>。</p>
 <p>即<code>(Animal -&gt; Duck) &lt;: (Bird -&gt; Bird)</code>。</p>
 <p>可以这样说：<strong>对于函数p和q，当p的参数更general，返回值更specific时，p可以安全地替代q</strong>。</p>
+<p>其实，Java8的<code>Function</code>接口的型变规则也是这样的，<code>compose</code>和<code>andThen</code>都是接收了一个<code>Function&lt;? super V, ? extends T&gt;</code>，恰恰正是<strong>参数逆变，返回值协变</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// see http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/java/util/function/Function.java</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">default</span> &lt;V&gt; <span class="function">Function&lt;V, R&gt; <span class="title">compose</span><span class="params">(Function&lt;? <span class="keyword">super</span> V, ? extends T&gt; before)</span> </span>&#123;</span><br><span class="line">        Objects.requireNonNull(before);</span><br><span class="line">        <span class="keyword">return</span> (V v) -&gt; apply(before.apply(v));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">default</span> &lt;V&gt; <span class="function">Function&lt;T, V&gt; <span class="title">andThen</span><span class="params">(Function&lt;? <span class="keyword">super</span> R, ? extends V&gt; after)</span> </span>&#123;</span><br><span class="line">        Objects.requireNonNull(after);</span><br><span class="line">        <span class="keyword">return</span> (T t) -&gt; after.apply(apply(t));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="references"><a class="header-anchor" href="#references">¶</a>References</h2>
 <ol>
 <li><a href="https://www.stephanboyer.com/post/132/what-are-covariance-and-contravariance" target="_blank" rel="noopener">What are covariance and contravariance?</a></li>

@@ -387,12 +387,17 @@
 
       
         
-          <h3 id="基础准备"><a href="#基础准备" class="headerlink" title="基础准备"></a>基础准备</h3><ul>
+          <h3 id="基础准备"><a class="header-anchor" href="#基础准备">¶</a>基础准备</h3>
+<ul>
 <li><a href="https://www.haskell.org/downloads" target="_blank" rel="noopener">Haskell</a> (我选择的是Haskell Platform 8.0.1)</li>
 <li><a href="https://www.sublimetext.com/3" target="_blank" rel="noopener">Sublime Text</a></li>
 <li><a href="https://packagecontrol.io/installation" target="_blank" rel="noopener">Package Control: The Sublime Text package manager</a></li>
 </ul>
-<h3 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h3><h4 id="SublimeHaskell"><a href="#SublimeHaskell" class="headerlink" title="SublimeHaskell"></a>SublimeHaskell</h4><p>在Package Control中安装SublimeHaskell。<br>插件安装完成后，重启Sublime报错，提示需要安装hsdev cabal package。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SublimeHaskell: hsdev executable couldn&apos;t be found!</span><br><span class="line">It&apos;s used in most features of SublimeHaskell</span><br><span class="line">Check if it&apos;s installed and in PATH</span><br><span class="line">If it&apos;s not installed, run &apos;cabal install hsdev&apos; to install hsdev</span><br><span class="line">You may also want to adjust &apos;add_to_PATH&apos; setting</span><br></pre></td></tr></table></figure></p>
+<h3 id="安装插件"><a class="header-anchor" href="#安装插件">¶</a>安装插件</h3>
+<h4 id="sublimehaskell"><a class="header-anchor" href="#sublimehaskell">¶</a>SublimeHaskell</h4>
+<p>在Package Control中安装SublimeHaskell。<br>
+插件安装完成后，重启Sublime报错，提示需要安装hsdev cabal package。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SublimeHaskell: hsdev executable couldn&apos;t be found!</span><br><span class="line">It&apos;s used in most features of SublimeHaskell</span><br><span class="line">Check if it&apos;s installed and in PATH</span><br><span class="line">If it&apos;s not installed, run &apos;cabal install hsdev&apos; to install hsdev</span><br><span class="line">You may also want to adjust &apos;add_to_PATH&apos; setting</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
             <div class="post-button text-center">
@@ -568,10 +573,16 @@
           
             <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="给算数表达式加上括号"><a href="#给算数表达式加上括号" class="headerlink" title="给算数表达式加上括号"></a>给算数表达式加上括号</h4><p>按照运算符优先级就可以，略过。</p>
-<h4 id="修改代码，使之正确"><a href="#修改代码，使之正确" class="headerlink" title="修改代码，使之正确"></a>修改代码，使之正确</h4><p>将<code>length xs</code>用括号括起来即可。</p>
-<h4 id="尝试定义last"><a href="#尝试定义last" class="headerlink" title="尝试定义last"></a>尝试定义<code>last</code></h4><p><code>last</code>: 返回非空list的最后一个元素<br><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">mylast</span> a = a !! ((length a) - <span class="number">1</span>)</span><br></pre></td></tr></table></figure></p>
-<h4 id="尝试定义init"><a href="#尝试定义init" class="headerlink" title="尝试定义init"></a>尝试定义<code>init</code></h4><p><code>init</code>: 删除非空list的最后一个元素，并返回list<br><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">myinit1</span> a = take ((length a) - <span class="number">1</span>) a</span><br><span class="line"></span><br><span class="line"><span class="title">myinit2</span> a = <span class="keyword">let</span> n = length a <span class="keyword">in</span> reverse (tail (reverse a))</span><br></pre></td></tr></table></figure></p>
+<h4 id="给算数表达式加上括号"><a class="header-anchor" href="#给算数表达式加上括号">¶</a>给算数表达式加上括号</h4>
+<p>按照运算符优先级就可以，略过。</p>
+<h4 id="修改代码-使之正确"><a class="header-anchor" href="#修改代码-使之正确">¶</a>修改代码，使之正确</h4>
+<p>将<code>length xs</code>用括号括起来即可。</p>
+<h4 id="尝试定义last"><a class="header-anchor" href="#尝试定义last">¶</a>尝试定义<code>last</code></h4>
+<p><code>last</code>: 返回非空list的最后一个元素</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">mylast</span> a = a !! ((length a) - <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<h4 id="尝试定义init"><a class="header-anchor" href="#尝试定义init">¶</a>尝试定义<code>init</code></h4>
+<p><code>init</code>: 删除非空list的最后一个元素，并返回list</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">myinit1</span> a = take ((length a) - <span class="number">1</span>) a</span><br><span class="line"></span><br><span class="line"><span class="title">myinit2</span> a = <span class="keyword">let</span> n = length a <span class="keyword">in</span> reverse (tail (reverse a))</span><br></pre></td></tr></table></figure>
 
           
         
@@ -727,7 +738,8 @@
 
       
         
-          <h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>用<code>hexo d</code>命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。</p>
+          <h3 id="问题描述"><a class="header-anchor" href="#问题描述">¶</a>问题描述</h3>
+<p>用<code>hexo d</code>命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">▶ hexo d</span><br><span class="line">INFO  Deploying: git</span><br><span class="line">INFO  Clearing .deploy_git folder...</span><br><span class="line">INFO  Copying files from public folder...</span><br><span class="line">On branch master</span><br><span class="line">nothing to commit, working directory clean</span><br><span class="line">^CINFO  Bye!</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
@@ -903,7 +915,9 @@
         
           <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="给出double-double-2-的另外一种可能解释。"><a href="#给出double-double-2-的另外一种可能解释。" class="headerlink" title="给出double (double 2)的另外一种可能解释。"></a>给出<code>double (double 2)</code>的另外一种可能解释。</h4><p>书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。<br><figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">double</span> (double <span class="number">2</span>)</span><br><span class="line">= double <span class="number">2</span> + double <span class="number">2</span></span><br><span class="line">= double <span class="number">2</span> + (<span class="number">2</span> + <span class="number">2</span>)</span><br><span class="line">= double <span class="number">2</span> + <span class="number">4</span></span><br><span class="line">= (<span class="number">2</span> + <span class="number">2</span>) + <span class="number">4</span></span><br><span class="line">= <span class="number">4</span> + <span class="number">4</span></span><br><span class="line">= <span class="number">8</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="给出double-double-2-的另外一种可能解释"><a class="header-anchor" href="#给出double-double-2-的另外一种可能解释">¶</a>给出<code>double (double 2)</code>的另外一种可能解释。</h4>
+<p>书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">double</span> (double <span class="number">2</span>)</span><br><span class="line">= double <span class="number">2</span> + double <span class="number">2</span></span><br><span class="line">= double <span class="number">2</span> + (<span class="number">2</span> + <span class="number">2</span>)</span><br><span class="line">= double <span class="number">2</span> + <span class="number">4</span></span><br><span class="line">= (<span class="number">2</span> + <span class="number">2</span>) + <span class="number">4</span></span><br><span class="line">= <span class="number">4</span> + <span class="number">4</span></span><br><span class="line">= <span class="number">8</span></span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
             <div class="post-button text-center">
