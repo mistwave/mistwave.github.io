@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>http://duanyifu.com/2019/09/30/functor-in-FP/</loc>
+        <lastmod>2019-09-30T15:49:13.966Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>http://duanyifu.com/2019/08/30/variance/</loc>
         <lastmod>2019-09-01T10:51:11.298Z</lastmod>
         <changefreq>weekly</changefreq>
