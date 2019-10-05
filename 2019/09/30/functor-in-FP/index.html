@@ -107,7 +107,7 @@
 <meta property="og:site_name" content="Yifu&#39;s Blog">
 <meta property="og:description" content="¶什么是Functor？ 先看一段代码： 12345678910111213// jsArray(1,2,3)  .map(i =&amp;gt; i ** 2)  .map(i =&amp;gt; i ** i)// [1, 16, 81]// scalaRight(3).map(n =&amp;gt; n + &quot; cats!&quot;)// res2: Either[Nothing, String] = Right(&quot;3 c">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-09-30T15:49:13.966Z">
+<meta property="og:updated_time" content="2019-10-05T06:54:08.407Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Functor in Functional Programming">
 <meta name="twitter:description" content="¶什么是Functor？ 先看一段代码： 12345678910111213// jsArray(1,2,3)  .map(i =&amp;gt; i ** 2)  .map(i =&amp;gt; i ** i)// [1, 16, 81]// scalaRight(3).map(n =&amp;gt; n + &quot; cats!&quot;)// res2: Either[Nothing, String] = Right(&quot;3 c">
@@ -331,13 +331,23 @@
                 
               
 
-              <time title="Created: 2019-09-30 15:22:56 / Modified: 23:49:13" itemprop="dateCreated datePublished" datetime="2019-09-30T15:22:56+08:00">2019-09-30</time>
+              <time title="Created: 2019-09-30 15:22:56" itemprop="dateCreated datePublished" datetime="2019-09-30T15:22:56+08:00">2019-09-30</time>
             </span>
           
 
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-10-05 14:54:08" itemprop="dateModified" datetime="2019-10-05T14:54:08+08:00">2019-10-05</time>
+              </span>
             
           
 
@@ -449,8 +459,11 @@
 <li>给<code>SomeFunc[A]</code>一个<code>A =&gt; B</code></li>
 <li>得到一个<code>SomeFunc[B]</code></li>
 </ol>
-<p>怎么样，我们是不是对<code>SomeFunc</code>进行了一次<code>map</code>。</p>
-<p>这个我们其实叫它Reader Functor（详细内容可以看references中第一篇）。</p>
+<p>怎么样，我们是不是对<code>SomeFunc</code>进行了一次<code>map</code>。<br>
+看一段例子，这里我们用到了cats这个库，cats为Scala提供了很多函数式的抽象。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> cats.instances.function._</span><br><span class="line"><span class="keyword">import</span> cats.syntax.functor._</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> func1: <span class="type">Int</span> =&gt; <span class="type">String</span> =</span><br><span class="line">  (x: <span class="type">Int</span>) =&gt; x.toString</span><br><span class="line"></span><br><span class="line"><span class="keyword">val</span> func2: <span class="type">String</span> =&gt; <span class="type">String</span> =</span><br><span class="line">  (y: <span class="type">String</span>) =&gt; y + y</span><br><span class="line"></span><br><span class="line"><span class="comment">// three ways to compose functions</span></span><br><span class="line"><span class="comment">// 1. using map</span></span><br><span class="line">(func1.map(func2))(<span class="number">2</span>)</span><br><span class="line"><span class="comment">// 2. using andThen</span></span><br><span class="line">(func1.andThen(func2))(<span class="number">2</span>)</span><br><span class="line"><span class="comment">// 3. by hand</span></span><br><span class="line">func2(func1(<span class="number">2</span>))</span><br></pre></td></tr></table></figure>
+<p>当我们写下<code>val f = f1.map(f2).map(f3).map(f4)</code>的时候，这一串<code>map</code>就是将一系列的计算’串’在了一起，等到<code>f</code>被调用的时候再执行（和<code>Future</code>一样）。</p>
+<p>PS: 这个我们其实叫它Reader Functor（详细内容可以看references中第一篇）。</p>
 <h2 id="小结"><a class="header-anchor" href="#小结">¶</a>小结</h2>
 <p>functor是FP中非常非常基础的抽象，就像monoid一样，看上去对我们日常的编程并没有太大的作用（其实我们可以根据functor构建通用的<code>zip</code>和<code>unzip</code>）。不过没关系，之后我们还会研究一些functor的特例，monad和applicative functor，这些是十分实用且普遍的。</p>
 <p>PS：你可以在范畴论中找到functor的原型，functor是范畴的态射（morphism of categories），会将一个范畴中的morphism和object映射到另一个范畴中。</p>
