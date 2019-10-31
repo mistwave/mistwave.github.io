@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    search: {
+      root: '/',
+      path: ''
+    },
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: 'Copy',
+      copy_success: 'Copied',
+      copy_failure: 'Copy failed'
+    }
+  };
+</script>
+
+  <meta name="description" content="Monad ---- “the m-word”，“a monoid in the category of endofunctors”. see A monad is just a monoid in the category of endofunctors, what’s the problem? for fun  在FP的路上，不可避免地会碰到monad这个拦路虎。绕是绕不过去的，那就学咯。 “">
+<meta name="keywords" content="Functional Programming,Scala,Monad">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Monad in FP, part I">
+<meta property="og:url" content="http://duanyifu.com/2019/10/31/monad/index.html">
+<meta property="og:site_name" content="Yifu&#39;s Blog">
+<meta property="og:description" content="Monad ---- “the m-word”，“a monoid in the category of endofunctors”. see A monad is just a monoid in the category of endofunctors, what’s the problem? for fun  在FP的路上，不可避免地会碰到monad这个拦路虎。绕是绕不过去的，那就学咯。 “">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-10-31T10:14:22.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Monad in FP, part I">
+<meta name="twitter:description" content="Monad ---- “the m-word”，“a monoid in the category of endofunctors”. see A monad is just a monoid in the category of endofunctors, what’s the problem? for fun  在FP的路上，不可避免地会碰到monad这个拦路虎。绕是绕不过去的，那就学咯。 “">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Yifu's Blog" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="http://duanyifu.com/2019/10/31/monad/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  
+  <title>Monad in FP, part I | Yifu's Blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yifu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2019/10/31/monad/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yifu Duan">
+      <meta itemprop="description" content="Contact me at me###duanyifu.com">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yifu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Monad in FP, part I
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-10-31 18:22:56 / Modified: 18:14:22" itemprop="dateCreated datePublished" datetime="2019-10-31T18:22:56+08:00">2019-10-31</time>
+            </span>
+          
+
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Programming/" itemprop="url" rel="index"><span itemprop="name">Programming</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+                 Views:  
+                <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+              </span>
+            </span>
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong><em>Monad ---- “the m-word”，“a monoid in the category of endofunctors”.</em></strong><br>
+<em>see <a href="https://stackoverflow.com/questions/3870088/a-monad-is-just-a-monoid-in-the-category-of-endofunctors-whats-the-problem" target="_blank" rel="noopener">A monad is just a monoid in the category of endofunctors, what’s the problem?</a> for fun</em></p>
+<hr>
+<p>在FP的路上，不可避免地会碰到monad这个拦路虎。绕是绕不过去的，那就学咯。</p>
+<p><em>“我看了几十篇关于monad的文章，还是没懂。” – 某不知名FP爱好者</em></p>
+<p>这篇文章也不是silver bullet，我只希望读者在读过以后，对monad能有个大致的、模糊的印象，今后能够持续地从多个角度去审视这个概念，加深认识。</p>
+<h2 id="什么是monad"><a class="header-anchor" href="#什么是monad">¶</a>什么是monad</h2>
+<p>我们在说functor的时候，有一个不那么准确的定义：<strong>有<code>map</code>的，就是functor</strong>。</p>
+<p>当我们这样定义的时候，我们其实是在泛化<code>map</code>，将它们的共性抽象出来，这个抽象就是functor。</p>
+<p>同样地，<code>flatMap</code>也出现在很多地方（比如<code>List</code>，<code>Option</code>，<code>Future</code>，<code>Either</code>等等等），我们自然也想把共性抽象出来，这个抽象，就是monad。所以可以类似地说：<strong>有<code>flatMap</code>的，就是monad</strong>。</p>
+<p>好吧，如果要正式一点，引用下<em>scala with cats</em>里的定义：<strong>monad是一种将计算按顺序排列起来的机制（a mechanism for sequencing computations）</strong>。</p>
+<a id="more"></a>
+<h2 id="flatmap是什么"><a class="header-anchor" href="#flatmap是什么">¶</a><code>flatMap</code>是什么</h2>
+<p>如果你熟悉<code>flatMap</code>，可以跳过这一小节。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, friends: <span class="type">List</span>[<span class="type">String</span>]</span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">val</span> <span class="title">bob</span> </span>= <span class="type">Person</span>(<span class="string">"Bob"</span>, <span class="type">List</span>(<span class="string">"Alice"</span>, <span class="string">"Pika"</span>))</span><br><span class="line"><span class="comment">// bob: Person = Person("Bob", List("Alice", "Pika"))</span></span><br><span class="line"><span class="keyword">val</span> harry = <span class="type">Person</span>(<span class="string">"Harry"</span>, <span class="type">List</span>(<span class="string">"Ron"</span>, <span class="string">"Hermione"</span>))</span><br><span class="line"><span class="comment">// harry: Person = Person("Harry", List("Ron", "Hermione"))</span></span><br><span class="line"><span class="keyword">val</span> ps = <span class="type">List</span>(bob, harry)</span><br><span class="line"><span class="comment">// ps: List[Person] = List(Person("Bob", List("Alice", "Pika")), Person("Harry", List("Ron", "Hermione")))</span></span><br><span class="line"></span><br><span class="line">ps.map(_.friends)</span><br><span class="line"><span class="comment">// res4: List[List[String]] = List(List("Alice", "Pika"), List("Ron", "Hermione"))</span></span><br><span class="line"></span><br><span class="line">ps.flatMap(_.friends)</span><br><span class="line"><span class="comment">// res5: List[String] = List("Alice", "Pika", "Ron", "Hermione")</span></span><br></pre></td></tr></table></figure>
+<p>对于<code>List[A]</code>来说，<code>map</code>和<code>flatMap</code>的签名，仅仅是传入的<code>f</code>的返回类型不一样：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">List</span>[<span class="type">B</span>]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">flatMap</span></span>[<span class="type">A</span>, <span class="type">B</span>](f: <span class="type">A</span> =&gt; <span class="type">List</span>[<span class="type">B</span>]): <span class="type">List</span>[<span class="type">B</span>]</span><br></pre></td></tr></table></figure>
+<p>直观来讲，<code>flatMap</code>将<code>List</code>内的每一个A，转换成了一个<code>List[B]</code>，然后将所有的<code>List[B]</code>，连了起来。</p>
+<h2 id="举个栗子🌰"><a class="header-anchor" href="#举个栗子🌰">¶</a>举个栗子🌰</h2>
+<p>我们知道，<code>Option</code>可以用来表示结果是否存在。</p>
+<p>考虑整数除法：</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// not pure, can throw exception</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">naiveDiv</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>): <span class="type">Int</span> = x / y</span><br><span class="line"></span><br><span class="line">naiveDiv(<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line"><span class="comment">// java.lang.ArithmeticException: / by zero</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// pure</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">div</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>): <span class="type">Option</span>[<span class="type">Int</span>] = </span><br><span class="line">  <span class="keyword">if</span> (y == <span class="number">0</span>) <span class="type">None</span> <span class="keyword">else</span> <span class="type">Some</span>(x / y)</span><br><span class="line"></span><br><span class="line">div(<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line"><span class="comment">// res13: Option[Int] = None</span></span><br><span class="line">div(<span class="number">8</span>, <span class="number">2</span>)</span><br><span class="line"><span class="comment">// res14: Option[Int] = Some(4)</span></span><br></pre></td></tr></table></figure>
+<p>现在我们不仅要做除法，还要让用户输入这两个值，我们需要一个<code>parseInt</code></p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">naiveParseInt</span></span>(s: <span class="type">String</span>): <span class="type">Int</span> = s.toInt</span><br><span class="line"></span><br><span class="line">naiveParseInt(<span class="string">"12"</span>)</span><br><span class="line"><span class="comment">// res17: Int = 42</span></span><br><span class="line">naiveParseInt(<span class="string">"aa"</span>)</span><br><span class="line"><span class="comment">// java.lang.NumberFormatException: For input string: "aa"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> scala.util.<span class="type">Try</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parseInt</span></span>(s: <span class="type">String</span>): <span class="type">Option</span>[<span class="type">Int</span>] = <span class="type">Try</span>(s.toInt).toOption</span><br><span class="line"></span><br><span class="line">parseInt(<span class="string">"42"</span>)</span><br><span class="line"><span class="comment">// res24: Option[Int] = Some(42)</span></span><br><span class="line">parseInt(<span class="string">"aa"</span>)</span><br><span class="line"><span class="comment">// res25: Option[Int] = None</span></span><br></pre></td></tr></table></figure>
+<p>现在我们把他们串起来，自然地，我们也需要返回一个<code>Option[Int]</code>来涵盖结果的成功和失败。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stringDiv</span></span>(a: <span class="type">String</span>, b: <span class="type">String</span>): <span class="type">Option</span>[<span class="type">Int</span>] = </span><br><span class="line">  parseInt(a).flatMap &#123; x =&gt; </span><br><span class="line">    parseInt(b).flatMap &#123; y =&gt; </span><br><span class="line">      div(x, y)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">stringDiv(<span class="string">"10"</span>, <span class="string">"2"</span>)</span><br><span class="line"><span class="comment">// res28: Option[Int] = Some(5)</span></span><br><span class="line">stringDiv(<span class="string">"a"</span>, <span class="string">"1"</span>)</span><br><span class="line"><span class="comment">// res29: Option[Int] = None</span></span><br><span class="line">stringDiv(<span class="string">"22"</span>, <span class="string">"0"</span>)</span><br><span class="line"><span class="comment">// res30: Option[Int] = None</span></span><br></pre></td></tr></table></figure>
+<p><code>stringDiv</code>做了这些事情：</p>
+<ol>
+<li><code>parseInt(a)</code>返回一个<code>None</code>或者<code>Some(x)</code>；</li>
+<li>如果是<code>Some</code>，将<code>Some</code>内的值<code>x</code>取出来，传递给后面的函数；</li>
+<li><code>parseInt(b)</code>返回一个<code>None</code>或者<code>Some(y)</code>；</li>
+<li>如果是<code>Some</code>，将<code>Some</code>内的值<code>y</code>取出来，继续传给后面的函数；</li>
+<li>计算<code>div(x, y)</code>，返回最终结果<code>None</code>或者<code>Some(x)</code>。</li>
+</ol>
+<p>手动使用<code>flatMap</code>拼接比较繁琐，也不太容易看得清。Scala为我们提供了一个语法糖：for-comprehension。</p>
+<p>下面的<code>stringDiv2</code>与stringDiv是等价的，编译器会帮我们把for-comprehension编译成<code>flatMap</code>（和<code>map</code>）的调用链。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stringDiv2</span></span>(a: <span class="type">String</span>, b: <span class="type">String</span>): <span class="type">Option</span>[<span class="type">Int</span>] = </span><br><span class="line">  <span class="keyword">for</span> &#123;</span><br><span class="line">    x &lt;- parseInt(a)</span><br><span class="line">    y &lt;- parseInt(b)</span><br><span class="line">    res &lt;- div(x, y)</span><br><span class="line">  &#125; <span class="keyword">yield</span> res</span><br></pre></td></tr></table></figure>
+<p>审视一下上面的例子，我们确确实实地将计算给串起来了。</p>
+<p><code>flatMap</code>起了什么作用呢？</p>
+<p><strong><code>flatMap</code>将<code>Option[Int]</code>上游中的值抽出来，执行运算，再塞进<code>Option[Int]</code>中，传递给下游。</strong></p>
+<p>因为<code>div</code>只能接受<code>Int</code>，而传给<code>div</code>的是<code>Option[Int]</code>，所以我们不能用简单的函数组合来解决问题。</p>
+<table>
+<thead>
+<tr>
+<th>using <code>compose</code></th>
+<th>using <code>flatMap</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>naiveParseInt: String =&gt; Int</code></td>
+<td><code>parseInt: String =&gt; Option[Int]</code></td>
+</tr>
+<tr>
+<td><code>naiveDiv: (Int, Int) =&gt; Int</code></td>
+<td><code>div: (Int, Int) =&gt; Option[Int]</code></td>
+</tr>
+<tr>
+<td><code>(a, b) =&gt; naiveDiv(naiveParseInt(a),naiveParseInt(b))</code></td>
+<td>see <code>stringDiv2</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="monad的定义"><a class="header-anchor" href="#monad的定义">¶</a><code>Monad</code>的定义</h2>
+<p>在上述的例子中，我们使用<code>flatMap</code>将<code>Option[Int]</code>串了起来。</p>
+<p>如果我们只有<code>Int</code>，<code>flatMap</code>岂不是毫无作用？</p>
+<p>没关系，我们还有<code>unit</code>，可以把一个值<code>A</code>变成<code>F[A]</code>，可以视作将一个纯粹的值提升到了monad上下文中。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Monad</span>[<span class="type">F</span>[_]] </span>&#123;</span><br><span class="line">  <span class="comment">// `unit` is also known as `pure` or `return`</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">unit</span></span>[<span class="type">A</span>](value: <span class="type">A</span>): <span class="type">F</span>[<span class="type">A</span>]</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">flatMap</span></span>[<span class="type">A</span>, <span class="type">B</span>](ma: <span class="type">F</span>[<span class="type">A</span>])(f: <span class="type">A</span> =&gt; <span class="type">F</span>[<span class="type">B</span>]): <span class="type">F</span>[<span class="type">B</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们说过，monad是特殊的functor。换言之，所有的monad都是functor，不是所有的functor都是monad。</p>
+<p>因为我们可以使用<code>unit</code>和<code>flatMap</code>实现<code>map</code>，有了<code>map</code>，自然就是functor。</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](ma: <span class="type">F</span>[<span class="type">A</span>])(f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">F</span>[<span class="type">B</span>] = ???</span><br></pre></td></tr></table></figure>
+<p>这个实现是显然且唯一的，答案在文章末尾。</p>
+<h2 id="小结"><a class="header-anchor" href="#小结">¶</a>小结</h2>
+<p>这次我们通过一个简单的例子阐述了monad的作用，并写下了monad的一种形式化定义。</p>
+<p>接下来，我们还会研究monad定律，研究monad的不同表现形式。</p>
+<p>最后，我们会研究大量的monad实例，来加深理解。</p>
+<h2 id="reference"><a class="header-anchor" href="#reference">¶</a>Reference</h2>
+<ol>
+<li><a href="https://bartoszmilewski.com/2016/11/21/monads-programmers-definition/" target="_blank" rel="noopener">Monads: Programmer’s Definition</a></li>
+<li><a href="https://underscore.io/books/scala-with-cats/" target="_blank" rel="noopener">Monads – Chapter 3 in <em>Scala with Cats</em></a></li>
+<li><a href="https://www.manning.com/books/functional-programming-in-scala" target="_blank" rel="noopener">Monad – Chapter 11 in <em>Functional Programming in Scala</em></a></li>
+</ol>
+<h2 id="答案：通过unit和flatmap实现map"><a class="header-anchor" href="#答案：通过unit和flatmap实现map">¶</a>答案：通过<code>unit</code>和<code>flatMap</code>实现<code>map</code></h2>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](ma: <span class="type">F</span>[<span class="type">A</span>])(f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">F</span>[<span class="type">B</span>] = </span><br><span class="line">  flatMap(ma)(a =&gt; unit(f(a)))</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/Functional-Programming/" rel="tag"># Functional Programming</a>
+          
+            <a href="/tags/Scala/" rel="tag"># Scala</a>
+          
+            <a href="/tags/Monad/" rel="tag"># Monad</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/30/functor-in-FP/" rel="next" title="Functor in Functional Programming">
+                <i class="fa fa-chevron-left"></i> Functor in Functional Programming
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  
+  <p class="site-author-name" itemprop="name">Yifu Duan</p>
+  <div class="site-description motion-element" itemprop="description">Contact me at me###duanyifu.com</div>
+</div>
+
+
+  <nav class="site-state motion-element">
+    
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+    
+
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span>
+        
+      </div>
+    
+
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">tags</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+          
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是monad"><span class="nav-number">1.</span> <span class="nav-text">¶什么是monad</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#flatmap是什么"><span class="nav-number">2.</span> <span class="nav-text">¶flatMap是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#举个栗子🌰"><span class="nav-number">3.</span> <span class="nav-text">¶举个栗子🌰</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monad的定义"><span class="nav-number">4.</span> <span class="nav-text">¶Monad的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">¶小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reference"><span class="nav-number">6.</span> <span class="nav-text">¶Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#答案：通过unit和flatmap实现map"><span class="nav-number">7.</span> <span class="nav-text">¶答案：通过unit和flatMap实现map</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yifu Duan</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.2.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="Total Visitors">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+  
+
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="Total Views">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+  
+
+  
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+</body>
+</html>

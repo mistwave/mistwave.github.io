@@ -107,7 +107,7 @@
 <meta property="og:site_name" content="Yifu&#39;s Blog">
 <meta property="og:description" content="¶什么是Functor？ 先看一段代码： 12345678910111213// jsArray(1,2,3)  .map(i =&amp;gt; i ** 2)  .map(i =&amp;gt; i ** i)// [1, 16, 81]// scalaRight(3).map(n =&amp;gt; n + &quot; cats!&quot;)// res2: Either[Nothing, String] = Right(&quot;3 c">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-10-05T06:54:08.407Z">
+<meta property="og:updated_time" content="2019-10-31T10:15:17.972Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Functor in Functional Programming">
 <meta name="twitter:description" content="¶什么是Functor？ 先看一段代码： 12345678910111213// jsArray(1,2,3)  .map(i =&amp;gt; i ** 2)  .map(i =&amp;gt; i ** i)// [1, 16, 81]// scalaRight(3).map(n =&amp;gt; n + &quot; cats!&quot;)// res2: Either[Nothing, String] = Right(&quot;3 c">
@@ -346,7 +346,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-10-05 14:54:08" itemprop="dateModified" datetime="2019-10-05T14:54:08+08:00">2019-10-05</time>
+                <time title="Modified: 2019-10-31 18:15:17" itemprop="dateModified" datetime="2019-10-31T18:15:17+08:00">2019-10-31</time>
               </span>
             
           
@@ -413,6 +413,7 @@
 <p>可以将functor想象成一个容器，容器里放了一些元素。</p>
 <p><code>map</code>并不是对容器进行一次遍历（traverse），而是对容器内的元素做一个变换（transform）。</p>
 <p>如果有多个<code>map</code>被串起来了，则会按照先后顺序，进行变换。（这里顺序是很重要的，下面会细说）</p>
+<a id="more"></a>
 <h2 id="functor的定义"><a class="header-anchor" href="#functor的定义">¶</a>Functor的定义</h2>
 <p>我们可以将functor定义为一个trait：</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Functor</span>[<span class="type">F</span>[_]] </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](as: <span class="type">F</span>[<span class="type">A</span>])(f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">F</span>[<span class="type">B</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -530,6 +531,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2019/10/31/monad/" rel="prev" title="Monad in FP, part I">
+                Monad in FP, part I <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -596,7 +601,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -662,7 +667,9 @@
         
           
         
-        <span class="site-state-item-count">14</span>
+          
+        
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">tags</span>
         
       </div>
