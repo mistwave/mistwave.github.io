@@ -287,6 +287,192 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2019/12/30/ForkJoinPool/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yifu Duan">
+      <meta itemprop="description" content="Contact me at me###duanyifu.com">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yifu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/12/30/ForkJoinPool/" class="post-title-link" itemprop="url">ForkJoinPool简介</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-12-30 06:33:56" itemprop="dateCreated datePublished" datetime="2019-12-30T06:33:56+08:00">2019-12-30</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-12-31 13:24:30" itemprop="dateModified" datetime="2019-12-31T13:24:30+08:00">2019-12-31</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Programming/" itemprop="url" rel="index"><span itemprop="name">Programming</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="tl-dr">TL;DR</h2>
+<p><code>ForkJoinPool</code>是实现了<a href="https://en.wikipedia.org/wiki/Work_stealing" target="_blank" rel="noopener">work stealing</a>的线程池，其中所有线程都是<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html" target="_blank" rel="noopener">daemon thread</a>。</p>
+<h2 id="几个栗子🌰">几个栗子🌰</h2>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Java 7+</span></span><br><span class="line">CompletableFuture.supplyAsync(() -&gt; <span class="number">10</span>)</span><br><span class="line">  .thenCombineAsync(CompletableFuture.supplyAsync(() -&gt; <span class="number">32</span>),</span><br><span class="line">                    Integer::sum)</span><br><span class="line">  .thenAcceptAsync(x -&gt; System.out.println(<span class="string">"The answer is "</span> + x + <span class="string">"!"</span>));</span><br><span class="line"><span class="comment">// The answer is 42!</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Java 8+</span></span><br><span class="line">LongStream.rangeClosed(<span class="number">1</span>, <span class="number">1000000</span>)</span><br><span class="line">  .parallel()</span><br><span class="line">  .sum()</span><br><span class="line"><span class="comment">// 500000500000</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Scala</span></span><br><span class="line">(<span class="number">1</span> to <span class="number">1000000</span>).toVector.par.fold(<span class="number">0</span>)(_ + _)</span><br><span class="line"><span class="comment">// 500000500000</span></span><br></pre></td></tr></table></figure>
+<p>三个例子分别是：</p>
+<ol>
+<li>使用<code>CompletableFuture</code>组合异步计算：其中每个以<em>Async</em>结尾的方法，都再次将任务提交给了线程池，大概率会在另外一个线程中执行；</li>
+<li>使用<code>.parallel()</code>并行处理Stream：<code>.sum()</code>对并行Stream有优化，可以提升效率；</li>
+<li>使用<code>.par</code>将<code>Vector</code>变成并行的进行<code>fold</code>：Monoid满足结合律，所以可以并行<code>fold</code>。</li>
+</ol>
+<p>承载这些异步、并行计算的线程池，默认会使用一个JVM为我们生成的<code>ForkJoinPool</code>，可以用<code>ForkJoinPool.commonPool()</code>得到实例。</p>
+<p>除此之外，Scala中的<code>scala.concurrent.Future</code>一般会使用到<code>scala.concurrent.ExecutionContext.Implicits.global</code>，而后者就是包装了这个common pool。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/12/30/ForkJoinPool/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2019/10/31/monad-in-FP-part-I/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -393,7 +579,7 @@
 <p>在FP的路上，不可避免地会碰到monad这个拦路虎。绕是绕不过去的，那就学咯。</p>
 <p><em>“我看了几十篇关于monad的文章，还是没懂。” – 某不知名FP爱好者</em></p>
 <p>这篇文章也不是silver bullet，我只希望读者在读过以后，对monad能有个大致的、模糊的印象，今后能够持续地从多个角度去审视这个概念，加深认识。</p>
-<h2 id="什么是monad"><a class="header-anchor" href="#什么是monad">¶</a>什么是monad</h2>
+<h2 id="什么是monad">什么是monad</h2>
 <p>我们在说functor的时候，有一个不那么准确的定义：<strong>有<code>map</code>的，就是functor</strong>。</p>
 <p>当我们这样定义的时候，我们其实是在泛化<code>map</code>，将它们的共性抽象出来，这个抽象就是functor。</p>
 <p>同样地，<code>flatMap</code>也出现在很多地方（比如<code>List</code>，<code>Option</code>，<code>Future</code>，<code>Either</code>等等等），我们自然也想把共性抽象出来，这个抽象，就是monad。所以可以类似地说：<strong>有<code>flatMap</code>的，就是monad</strong>。</p>
@@ -570,7 +756,7 @@
 
       
         
-          <h2 id="什么是functor？"><a class="header-anchor" href="#什么是functor？">¶</a>什么是Functor？</h2>
+          <h2 id="什么是functor？">什么是Functor？</h2>
 <p>先看一段代码：</p>
 <figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// js</span></span><br><span class="line"><span class="built_in">Array</span>(<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>)</span><br><span class="line">  .map(<span class="function"><span class="params">i</span> =&gt;</span> i ** <span class="number">2</span>)</span><br><span class="line">  .map(<span class="function"><span class="params">i</span> =&gt;</span> i ** i)</span><br><span class="line"><span class="comment">// [1, 16, 81]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// scala</span></span><br><span class="line">Right(<span class="number">3</span>).map(<span class="function"><span class="params">n</span> =&gt;</span> n + <span class="string">" cats!"</span>)</span><br><span class="line"><span class="comment">// res2: Either[Nothing, String] = Right("3 cats!")</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// java</span></span><br><span class="line">Optional.empty().map(n -&gt; <span class="string">"hi, "</span> + n);</span><br><span class="line"><span class="comment">// Optional.empty</span></span><br></pre></td></tr></table></figure>
 <p>这些类型都有<code>map</code>，而且看上去<code>map</code>的作用好像都相同。</p>
@@ -752,7 +938,7 @@
 
       
         
-          <h2 id="一些定义"><a class="header-anchor" href="#一些定义">¶</a>一些定义</h2>
+          <h2 id="一些定义">一些定义</h2>
 <p>考虑类型<code>A</code>和<code>C</code>，以及泛型构造器<code>F&lt;T&gt;</code>：</p>
 <ul>
 <li><strong>如果我们在一个需要<code>A</code>的地方，总能使用<code>C</code>，我们就可以说<code>C</code>是<code>A</code>的子类型（subtype）<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>，记作<code>C &lt;: A</code>。</strong></li>
@@ -760,7 +946,7 @@
 <li><strong>如果F是逆变的（contravariant），且<code>C &lt;: A</code>，则有<code>F&lt;A&gt; &lt;: F&lt;C&gt;</code>。</strong></li>
 <li><strong>如果F是不变的（invariant），无论<code>A</code>与<code>C</code>是什么关系，<code>F&lt;C&gt;</code> 与 <code>F&lt;A&gt;</code>都没有关系。</strong></li>
 </ul>
-<h2 id="collection视角"><a class="header-anchor" href="#collection视角">¶</a>Collection视角</h2>
+<h2 id="collection视角">Collection视角</h2>
 <p>先举用例子来看看Collection的型变规则。</p>
 <p><code>Duck</code>是<code>Bird</code>的子类，<code>Bird</code>是<code>Animal</code>的子类，记作<code>Duck &lt;: Bird &lt;: Animal</code>。</p>
 <p>TypeScript中的<code>Array</code>是协变的（covariant）：</p>
@@ -937,7 +1123,7 @@
 
       
         
-          <h2 id="monoid-是什么？"><a class="header-anchor" href="#monoid-是什么？">¶</a>Monoid 是什么？</h2>
+          <h2 id="monoid-是什么？">Monoid 是什么？</h2>
 <p>我们先看两组例子：</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// string concatenation</span></span><br><span class="line">concat(<span class="string">"foo"</span>,<span class="string">"bar"</span>) == <span class="string">"foobar"</span></span><br><span class="line">concat(<span class="string">""</span>, <span class="string">"latte"</span>) == concat(<span class="string">"latte"</span>, <span class="string">""</span>) == <span class="string">"latte"</span></span><br><span class="line">concat(<span class="string">"a"</span>, concat(<span class="string">"b"</span>, <span class="string">"c"</span>)) == concat(concat(<span class="string">"a"</span>, <span class="string">"b"</span>), <span class="string">"c"</span>) == <span class="string">"abc"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// integer addition</span></span><br><span class="line"><span class="number">3</span> + <span class="number">5</span> == <span class="number">8</span></span><br><span class="line"><span class="number">0</span> + <span class="number">42</span> == <span class="number">42</span> + <span class="number">0</span> == <span class="number">42</span></span><br><span class="line"><span class="number">1</span> + (<span class="number">2</span> + <span class="number">3</span>) == (<span class="number">1</span> + <span class="number">2</span>) + <span class="number">3</span> == <span class="number">6</span></span><br></pre></td></tr></table></figure>
 <p>我们可以发现，这两组操作其实有着相同的模式：</p>
@@ -1119,7 +1305,7 @@
 
       
         
-          <h3 id="前言"><a class="header-anchor" href="#前言">¶</a>前言</h3>
+          <h3 id="前言">前言</h3>
 <p>在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。<br>
 这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。</p>
 <p>运行环境：<br>
@@ -1303,9 +1489,9 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
 <p>其实从第8章开始，这本书对于monad就讲的太少，过几天这本书要出第二版，希望能在这方面改进改进。。。<br>
 我下单了一本《Haskell趣学指南》，打算结合起来看，然后再补上跳过的习题。</p>
 <hr>
-<h4 id="定义函数-mult-nat-nat-nat"><a class="header-anchor" href="#定义函数-mult-nat-nat-nat">¶</a>定义函数 mult :: Nat -&gt; Nat -&gt; Nat</h4>
+<h4 id="定义函数-mult-nat-nat-nat">定义函数 mult :: Nat -&gt; Nat -&gt; Nat</h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">data</span> <span class="type">Nat</span> = <span class="type">Zero</span> | <span class="type">Succ</span> <span class="type">Nat</span></span></span><br><span class="line"><span class="title">nat2int</span> :: <span class="type">Nat</span> -&gt; <span class="type">Int</span></span><br><span class="line"><span class="title">nat2int</span> <span class="type">Zero</span> = <span class="number">0</span></span><br><span class="line"><span class="title">nat2int</span> (<span class="type">Succ</span> n) = <span class="number">1</span> + nat2int n</span><br><span class="line"></span><br><span class="line"><span class="title">int2nat</span> :: <span class="type">Int</span> -&gt; <span class="type">Nat</span></span><br><span class="line"><span class="title">int2nat</span> <span class="number">0</span> = <span class="type">Zero</span></span><br><span class="line"><span class="title">int2nat</span> n = <span class="type">Succ</span> (int2nat (n - <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="title">add</span> :: <span class="type">Nat</span> -&gt; <span class="type">Nat</span> -&gt; <span class="type">Nat</span></span><br><span class="line"><span class="title">add</span> <span class="type">Zero</span> n = n</span><br><span class="line"><span class="title">add</span> (<span class="type">Succ</span> m) n = <span class="type">Succ</span> (add m n)</span><br><span class="line"></span><br><span class="line"><span class="title">mult</span> :: <span class="type">Nat</span> -&gt; <span class="type">Nat</span> -&gt; <span class="type">Nat</span></span><br><span class="line"><span class="title">mult</span> <span class="type">Zero</span> _ = <span class="type">Zero</span></span><br><span class="line"><span class="title">mult</span> (<span class="type">Succ</span> m) n = add (mult m n) n</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; nat2int(mult (int2nat 2) (int2nat 3))</span></span><br><span class="line"><span class="comment">-- 6</span></span><br><span class="line"><span class="comment">-- *Main&gt; nat2int(mult (int2nat 0) (int2nat 3))</span></span><br><span class="line"><span class="comment">-- 0</span></span><br><span class="line"><span class="comment">-- *Main&gt; nat2int(mult (int2nat 1) (int2nat 3))</span></span><br><span class="line"><span class="comment">-- 3</span></span><br><span class="line"><span class="comment">-- *Main&gt; nat2int(mult (int2nat 10) (int2nat 13))</span></span><br><span class="line"><span class="comment">-- 130</span></span><br></pre></td></tr></table></figure>
-<h4 id="重新定义occurs-int-tree-bool"><a class="header-anchor" href="#重新定义occurs-int-tree-bool">¶</a>重新定义<code>occurs :: Int -&gt; Tree -&gt; Bool</code></h4>
+<h4 id="重新定义occurs-int-tree-bool">重新定义<code>occurs :: Int -&gt; Tree -&gt; Bool</code></h4>
 <p>需要使用标准库<code>data Ordering = LT | EQ | GT</code>, 以及<br>
 <code>compare :: Ord =&gt; a -&gt; a -&gt; Ordering</code>。</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">data</span> <span class="type">Tree</span> = <span class="type">Leaf</span> <span class="type">Int</span> | <span class="type">Node</span> <span class="type">Tree</span> <span class="type">Int</span> <span class="type">Tree</span></span></span><br><span class="line"><span class="title">tr</span> :: <span class="type">Tree</span></span><br><span class="line"><span class="title">tr</span> = <span class="type">Node</span> (<span class="type">Node</span> (<span class="type">Leaf</span> <span class="number">1</span>) <span class="number">3</span> (<span class="type">Leaf</span> <span class="number">4</span>)) <span class="number">5</span> (<span class="type">Node</span> (<span class="type">Leaf</span> <span class="number">6</span>) <span class="number">7</span> (<span class="type">Leaf</span> <span class="number">9</span>))</span><br><span class="line"><span class="title">occurs</span> :: <span class="type">Int</span> -&gt; <span class="type">Tree</span> -&gt; <span class="type">Bool</span></span><br><span class="line"><span class="title">occurs</span> m (<span class="type">Leaf</span> n) = m == n</span><br><span class="line"><span class="title">occurs</span> m (<span class="type">Node</span> l n r) = <span class="keyword">case</span> compare m n <span class="keyword">of</span></span><br><span class="line">                            <span class="type">LT</span> -&gt; occurs m l</span><br><span class="line">                            <span class="type">EQ</span> -&gt; <span class="type">True</span></span><br><span class="line">                            <span class="type">GT</span> -&gt; occurs m r</span><br></pre></td></tr></table></figure>
@@ -1491,9 +1677,9 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
 <p>按照书上的<code>Parser</code>定义，是没法使用do notation的，所以下面的习题全部用<code>&gt;&gt;=</code>完成。</p>
 <p>完整的代码我放在<a href="https://gist.github.com/mistwave/b48c517e18436f6ac8fe350de929ee6a" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="int-parser-int"><a class="header-anchor" href="#int-parser-int">¶</a><code>int :: Parser Int</code></h4>
+<h4 id="int-parser-int"><code>int :: Parser Int</code></h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">int</span> :: <span class="type">Parser</span> <span class="type">Int</span></span><br><span class="line"><span class="title">int</span> = natural +++</span><br><span class="line">      (symbol <span class="string">"-"</span> &gt;&gt;= \_ -&gt;</span><br><span class="line">       natural &gt;&gt;= \x -&gt;</span><br><span class="line">       return (-x))</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; parse int "123da"</span></span><br><span class="line"><span class="comment">-- [(123,"da")]</span></span><br><span class="line"><span class="comment">-- *Main&gt; parse int "sdada"</span></span><br><span class="line"><span class="comment">-- []</span></span><br><span class="line"><span class="comment">-- *Main&gt; parse int "-213sdada"</span></span><br><span class="line"><span class="comment">-- [(-213,"sdada")]</span></span><br></pre></td></tr></table></figure>
-<h4 id="comment-parser"><a class="header-anchor" href="#comment-parser">¶</a><code>comment :: Parser ()</code></h4>
+<h4 id="comment-parser"><code>comment :: Parser ()</code></h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">comment</span> :: <span class="type">Parser</span> ()</span><br><span class="line"><span class="title">comment</span> = symbol <span class="string">"--"</span> &gt;&gt;= \_ -&gt;</span><br><span class="line">          many (sat (/= '\n')) &gt;&gt;= \_ -&gt;</span><br><span class="line">          many (char '\n') &gt;&gt;= \_ -&gt;</span><br><span class="line">          return ()  <span class="comment">-- why return ()?</span></span><br><span class="line"><span class="comment">-- *Main&gt; parse comment "foo"</span></span><br><span class="line"><span class="comment">-- []</span></span><br><span class="line"><span class="comment">-- *Main&gt; parse comment "--foo"</span></span><br><span class="line"><span class="comment">-- [((),"")]</span></span><br><span class="line"><span class="comment">-- *Main&gt; parse comment "--foo\nbar"</span></span><br><span class="line"><span class="comment">-- [((),"bar")]</span></span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
@@ -1669,9 +1855,9 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
         
           <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="用map和filter表示-f-x-x-xs-p-x"><a class="header-anchor" href="#用map和filter表示-f-x-x-xs-p-x">¶</a>用<code>map</code>和<code>filter</code>表示<code>[f x | x &lt;- xs, p x]</code></h4>
+<h4 id="用map和filter表示-f-x-x-xs-p-x">用<code>map</code>和<code>filter</code>表示<code>[f x | x &lt;- xs, p x]</code></h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- [f x | x &lt;- xs, p x]</span></span><br><span class="line"><span class="comment">-- [f x | x &lt;- xs, p x]</span></span><br><span class="line"><span class="comment">-- = map f (filter p xs)</span></span><br></pre></td></tr></table></figure>
-<h4 id="定义高阶函数all-any-takewhile-dropwhile"><a class="header-anchor" href="#定义高阶函数all-any-takewhile-dropwhile">¶</a>定义高阶函数<code>all</code>, <code>any</code>, <code>takeWhile</code>, <code>dropWhile</code></h4>
+<h4 id="定义高阶函数all-any-takewhile-dropwhile">定义高阶函数<code>all</code>, <code>any</code>, <code>takeWhile</code>, <code>dropWhile</code></h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">myall</span> :: (a -&gt; <span class="type">Bool</span>) -&gt; [a] -&gt; <span class="type">Bool</span></span><br><span class="line"><span class="title">myall</span> _ [] = <span class="type">True</span></span><br><span class="line"><span class="title">myall</span> p (x : xs) | p x == <span class="type">False</span> = <span class="type">False</span></span><br><span class="line">                 | otherwise = myall p xs</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; myall (&gt;3) [1..3]</span></span><br><span class="line"><span class="comment">-- False</span></span><br><span class="line"><span class="comment">-- *Main&gt; myall (&gt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- False</span></span><br><span class="line"><span class="comment">-- *Main&gt; myall (&gt;3) [4..5]</span></span><br><span class="line"><span class="comment">-- True</span></span><br><span class="line"></span><br><span class="line"><span class="title">myany</span> :: (a -&gt; <span class="type">Bool</span>) -&gt; [a] -&gt; <span class="type">Bool</span></span><br><span class="line"><span class="title">myany</span> _ [] = <span class="type">False</span></span><br><span class="line"><span class="title">myany</span> p (x : xs) | p x == <span class="type">True</span> = <span class="type">True</span></span><br><span class="line">                 | otherwise = myany p xs</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; myany (&gt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- True</span></span><br><span class="line"><span class="comment">-- *Main&gt; myany (&gt;3) [1..3]</span></span><br><span class="line"><span class="comment">-- False</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="title">mytakeWhile</span> :: (a -&gt; <span class="type">Bool</span>) -&gt; [a] -&gt; [a]</span><br><span class="line"><span class="title">mytakeWhile</span> _ [] = []</span><br><span class="line"><span class="title">mytakeWhile</span> p (x : xs) | p x == <span class="type">True</span> = x : mytakeWhile p xs</span><br><span class="line">                       | otherwise = []</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; mytakeWhile (&lt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- [1,2]</span></span><br><span class="line"><span class="comment">-- *Main&gt; mytakeWhile (&gt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- []</span></span><br><span class="line"><span class="comment">-- *Main&gt; mytakeWhile (&lt;3) [1,2,3,1,2]</span></span><br><span class="line"><span class="comment">-- [1,2]</span></span><br><span class="line"></span><br><span class="line"><span class="title">mydropWhile</span> :: (a -&gt; <span class="type">Bool</span>) -&gt; [a] -&gt; [a]</span><br><span class="line"><span class="title">mydropWhile</span> _ [] = []</span><br><span class="line"><span class="title">mydropWhile</span> p (x : xs) | p x == <span class="type">True</span> = mydropWhile p xs</span><br><span class="line">                       | otherwise = x : xs</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; mydropWhile (&lt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- [3,4,5]</span></span><br><span class="line"><span class="comment">-- *Main&gt; mydropWhile (&gt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- [1,2,3,4,5]</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
@@ -1838,196 +2024,15 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
           <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
 <p>这一章节就是在讲递归，所以下面的定义都是默认用递归定义。</p>
-<h4 id="定义幂函数"><a class="header-anchor" href="#定义幂函数">¶</a>定义幂函数</h4>
+<h4 id="定义幂函数">定义幂函数</h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">mypow</span> :: <span class="type">Int</span> -&gt; <span class="type">Int</span> -&gt; <span class="type">Int</span></span><br><span class="line"><span class="title">mypow</span> _ <span class="number">0</span> = <span class="number">1</span></span><br><span class="line"><span class="title">mypow</span> x n = x * mypow x (n<span class="number">-1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; mypow 2 3</span></span><br><span class="line"><span class="comment">-- 8</span></span><br><span class="line"><span class="comment">-- *Main&gt; mypow 3 0</span></span><br><span class="line"><span class="comment">-- 1</span></span><br><span class="line"><span class="comment">-- *Main&gt; mypow 3 1</span></span><br><span class="line"><span class="comment">-- 3</span></span><br></pre></td></tr></table></figure>
-<h4 id="解释length-drop-init的递归求值过程"><a class="header-anchor" href="#解释length-drop-init的递归求值过程">¶</a>解释<code>length</code>, <code>drop</code>, <code>init</code>的递归求值过程</h4>
+<h4 id="解释length-drop-init的递归求值过程">解释<code>length</code>, <code>drop</code>, <code>init</code>的递归求值过程</h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- length [1, 2, 3]</span></span><br><span class="line"><span class="comment">-- = 1 + length [2, 3]</span></span><br><span class="line"><span class="comment">-- = 1 + (1 + length [3])</span></span><br><span class="line"><span class="comment">-- = 1 + (1 + (1 + length []))</span></span><br><span class="line"><span class="comment">-- = 3</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- drop 3 [1..5]</span></span><br><span class="line"><span class="comment">-- = drop 2 [2..5]</span></span><br><span class="line"><span class="comment">-- = drop 1 [3..5]</span></span><br><span class="line"><span class="comment">-- = drop 0 [4, 5]</span></span><br><span class="line"><span class="comment">-- = [4, 5]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- init [1..3]</span></span><br><span class="line"><span class="comment">-- = 1 : init [2, 3]</span></span><br><span class="line"><span class="comment">-- = 1 : 2 : init [3]</span></span><br><span class="line"><span class="comment">-- = 1 : 2 : []</span></span><br><span class="line"><span class="comment">-- = [1, 2]</span></span><br></pre></td></tr></table></figure>
-<h4 id="定义以下库函数"><a class="header-anchor" href="#定义以下库函数">¶</a>定义以下库函数</h4>
+<h4 id="定义以下库函数">定义以下库函数</h4>
           <!--noindex-->
           
             <div class="post-button text-center">
               <a class="btn" href="/2016/08/28/PIHex6/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2016/08/27/PIHex5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yifu Duan">
-      <meta itemprop="description" content="Contact me at me###duanyifu.com">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yifu's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2016/08/27/PIHex5/" class="post-title-link" itemprop="url">Programming in Haskell Chapter5 Exercises Solutions</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-
-          
-          
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2016-08-27 23:13:37" itemprop="dateCreated datePublished" datetime="2016-08-27T23:13:37+08:00">2016-08-27</time>
-            </span>
-          
-
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2016-08-28 23:49:38" itemprop="dateModified" datetime="2016-08-28T23:49:38+08:00">2016-08-28</time>
-              </span>
-            
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Haskell/" itemprop="url" rel="index"><span itemprop="name">Haskell</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-          
-
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
-<hr>
-<h4 id="用list-comprehension计算1到100平方和"><a class="header-anchor" href="#用list-comprehension计算1到100平方和">¶</a>用List Comprehension计算1到100平方和</h4>
-<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">sum</span> [x^<span class="number">2</span> | x &lt;- [<span class="number">1.</span><span class="number">.100</span>]]</span><br></pre></td></tr></table></figure>
-<h4 id="定义库函数replicate"><a class="header-anchor" href="#定义库函数replicate">¶</a>定义库函数<code>replicate</code></h4>
-<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- &gt; replicate 3 True</span></span><br><span class="line"><span class="comment">-- [True, True, True]</span></span><br><span class="line"></span><br><span class="line"><span class="title">myreplicate</span> :: <span class="type">Int</span> -&gt; a -&gt; [a]</span><br><span class="line"><span class="title">myreplicate</span> n x = [x | _ &lt;- [<span class="number">1.</span>.n]]</span><br></pre></td></tr></table></figure>
-<h4 id="定义函数pyths"><a class="header-anchor" href="#定义函数pyths">¶</a>定义函数<code>pyths</code></h4>
-<p><code>pyths n</code>返回满足<code>x^2 + y^2 == z^2</code>的三元组<code>(x, y, z)</code>，其中xyz都小于等于n</p>
-<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- &gt; paths 10</span></span><br><span class="line"><span class="comment">-- [(3, 4, 5), (4, 3, 5), (6, 8, 10), (8, 6, 10)]</span></span><br><span class="line"></span><br><span class="line"><span class="title">pyths</span>   :: <span class="type">Int</span> -&gt; [(<span class="type">Int</span>, <span class="type">Int</span>, <span class="type">Int</span>)]</span><br><span class="line"><span class="title">pyths</span> n = [(x,y,z) | x &lt;- [<span class="number">1.</span>.n],</span><br><span class="line">                     y &lt;- [<span class="number">1.</span>.n],</span><br><span class="line">                     z &lt;- [<span class="number">1.</span>.n],</span><br><span class="line">                     x^<span class="number">2</span> + y^<span class="number">2</span> == z^<span class="number">2</span>]</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2016/08/27/PIHex5/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -2120,7 +2125,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

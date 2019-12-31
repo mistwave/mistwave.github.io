@@ -99,18 +99,18 @@
   };
 </script>
 
-  <meta name="description" content="问题描述 用hexo d命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。 1234567▶ hexo dINFO  Deploying: gitINFO  Clearing .deploy_git folder...INFO  Copying files from public folder...On branch masternothing to commit,">
-<meta name="keywords" content="hexo,git,shadowsocks">
+  <meta name="description" content="TL;DR ForkJoinPool是实现了work stealing的线程池，其中所有线程都是daemon thread。 几个栗子🌰 123456// Java 7+CompletableFuture.supplyAsync(() -&amp;gt; 10)  .thenCombineAsync(CompletableFuture.supplyAsync(() -&amp;gt; 32),">
+<meta name="keywords" content="Java,Scala">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hexo deploy 命令卡住的奇怪问题">
-<meta property="og:url" content="http://duanyifu.com/2016/08/23/hexo-deploy-problem/index.html">
+<meta property="og:title" content="ForkJoinPool简介">
+<meta property="og:url" content="http://duanyifu.com/2019/12/30/ForkJoinPool/index.html">
 <meta property="og:site_name" content="Yifu&#39;s Blog">
-<meta property="og:description" content="问题描述 用hexo d命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。 1234567▶ hexo dINFO  Deploying: gitINFO  Clearing .deploy_git folder...INFO  Copying files from public folder...On branch masternothing to commit,">
+<meta property="og:description" content="TL;DR ForkJoinPool是实现了work stealing的线程池，其中所有线程都是daemon thread。 几个栗子🌰 123456// Java 7+CompletableFuture.supplyAsync(() -&amp;gt; 10)  .thenCombineAsync(CompletableFuture.supplyAsync(() -&amp;gt; 32),">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2016-08-22T18:56:46.000Z">
+<meta property="og:updated_time" content="2019-12-31T05:24:30.837Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hexo deploy 命令卡住的奇怪问题">
-<meta name="twitter:description" content="问题描述 用hexo d命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。 1234567▶ hexo dINFO  Deploying: gitINFO  Clearing .deploy_git folder...INFO  Copying files from public folder...On branch masternothing to commit,">
+<meta name="twitter:title" content="ForkJoinPool简介">
+<meta name="twitter:description" content="TL;DR ForkJoinPool是实现了work stealing的线程池，其中所有线程都是daemon thread。 几个栗子🌰 123456// Java 7+CompletableFuture.supplyAsync(() -&amp;gt; 10)  .thenCombineAsync(CompletableFuture.supplyAsync(() -&amp;gt; 32),">
 
 
 
@@ -120,7 +120,7 @@
 
   
   
-  <link rel="canonical" href="http://duanyifu.com/2016/08/23/hexo-deploy-problem/">
+  <link rel="canonical" href="http://duanyifu.com/2019/12/30/ForkJoinPool/">
 
 
 
@@ -131,7 +131,7 @@
 </script>
 
   
-  <title>hexo deploy 命令卡住的奇怪问题 | Yifu's Blog</title>
+  <title>ForkJoinPool简介 | Yifu's Blog</title>
   
 
 
@@ -288,7 +288,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2016/08/23/hexo-deploy-problem/">
+    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2019/12/30/ForkJoinPool/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yifu Duan">
@@ -305,7 +305,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">hexo deploy 命令卡住的奇怪问题
+          <h1 class="post-title" itemprop="name headline">ForkJoinPool简介
 
               
             
@@ -331,13 +331,23 @@
                 
               
 
-              <time title="Created: 2016-08-23 02:25:10 / Modified: 02:56:46" itemprop="dateCreated datePublished" datetime="2016-08-23T02:25:10+08:00">2016-08-23</time>
+              <time title="Created: 2019-12-30 06:33:56" itemprop="dateCreated datePublished" datetime="2019-12-30T06:33:56+08:00">2019-12-30</time>
             </span>
           
 
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-12-31 13:24:30" itemprop="dateModified" datetime="2019-12-31T13:24:30+08:00">2019-12-31</time>
+              </span>
             
           
 
@@ -350,7 +360,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/疑难杂症/" itemprop="url" rel="index"><span itemprop="name">疑难杂症</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Programming/" itemprop="url" rel="index"><span itemprop="name">Programming</span></a></span>
 
                 
                 
@@ -393,29 +403,53 @@
       
 
       
-        <h3 id="问题描述">问题描述</h3>
-<p>用<code>hexo d</code>命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">▶ hexo d</span><br><span class="line">INFO  Deploying: git</span><br><span class="line">INFO  Clearing .deploy_git folder...</span><br><span class="line">INFO  Copying files from public folder...</span><br><span class="line">On branch master</span><br><span class="line">nothing to commit, working directory clean</span><br><span class="line">^CINFO  Bye!</span><br></pre></td></tr></table></figure>
-<a id="more"></a>
-<p><code>hexo d -debug</code>查看日志发现信息一直在循环</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">▶ hexo deploy -debug</span><br><span class="line">INFO  Start processing</span><br><span class="line">INFO  Files loaded in 620 ms</span><br><span class="line">INFO  0 files generated in 518 ms</span><br><span class="line">INFO  Start processing</span><br><span class="line">INFO  Files loaded in 468 ms</span><br><span class="line">INFO  0 files generated in 363 ms</span><br><span class="line">INFO  Start processing</span><br><span class="line">INFO  Files loaded in 342 ms</span><br><span class="line">...</span><br><span class="line">INFO  Start processing</span><br><span class="line">INFO  Files loaded in 274 ms</span><br><span class="line">INFO  0 files generated in 381 ms</span><br><span class="line">INFO  Start processing</span><br><span class="line">^CINFO  Bye!</span><br></pre></td></tr></table></figure>
-<h3 id="解决办法">解决办法</h3>
-<p>首先检查_config.yml文件，看看deployment相关配置写对了没</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Deployment</span><br><span class="line">## Docs: https://hexo.io/docs/deployment.html</span><br><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: git@github.com:mistwave/mistwave.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure>
-<p>对照官方文档后，发现配置并没有错，推测是ssh的问题。<br>
-将repo改成https地址后，问题依旧存在。</p>
-<p>找了一些类似问题的资料后，尝试了删除<code>.deploy_git</code>，更新git版本后，问题依然没有解决。</p>
-<p>但是在删除<code>.deploy_git</code>后，发现总是在gitlog后面卡住，推测是<code>git push</code>的问题，尝试让git走代理，问题解决，令人哭笑不得。</p>
-<p>git配置如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global http.proxy &apos;socks5://127.0.0.1:1080&apos;</span><br><span class="line">git config --global https.proxy &apos;socks5://127.0.0.1:1080&apos;</span><br></pre></td></tr></table></figure>
-<p>设置的意思是让http/https协议走代理，即Shadowsocks的本地代理。</p>
-<h3 id="参考文章">参考文章</h3>
+        <h2 id="tl-dr">TL;DR</h2>
+<p><code>ForkJoinPool</code>是实现了<a href="https://en.wikipedia.org/wiki/Work_stealing" target="_blank" rel="noopener">work stealing</a>的线程池，其中所有线程都是<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html" target="_blank" rel="noopener">daemon thread</a>。</p>
+<h2 id="几个栗子🌰">几个栗子🌰</h2>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Java 7+</span></span><br><span class="line">CompletableFuture.supplyAsync(() -&gt; <span class="number">10</span>)</span><br><span class="line">  .thenCombineAsync(CompletableFuture.supplyAsync(() -&gt; <span class="number">32</span>),</span><br><span class="line">                    Integer::sum)</span><br><span class="line">  .thenAcceptAsync(x -&gt; System.out.println(<span class="string">"The answer is "</span> + x + <span class="string">"!"</span>));</span><br><span class="line"><span class="comment">// The answer is 42!</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Java 8+</span></span><br><span class="line">LongStream.rangeClosed(<span class="number">1</span>, <span class="number">1000000</span>)</span><br><span class="line">  .parallel()</span><br><span class="line">  .sum()</span><br><span class="line"><span class="comment">// 500000500000</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Scala</span></span><br><span class="line">(<span class="number">1</span> to <span class="number">1000000</span>).toVector.par.fold(<span class="number">0</span>)(_ + _)</span><br><span class="line"><span class="comment">// 500000500000</span></span><br></pre></td></tr></table></figure>
+<p>三个例子分别是：</p>
 <ol>
-<li><a href="https://github.com/hexojs/hexo/issues/1478" target="_blank" rel="noopener">hexo repo上一个类似issues</a></li>
-<li><a href="http://www.wuliaole.com/post/the_lag_problem_for_hexo_deploying_on_github/" target="_blank" rel="noopener">hexo在github部署卡住的奇怪问题</a></li>
-<li><a href="http://droidyue.com/blog/2016/04/04/set-shadowsocks-proxy-for-terminal/index.html" target="_blank" rel="noopener">为终端设置Shadowsocks代理</a></li>
-<li><a href="http://blog.fazero.cc/2015/07/11/%E7%94%A8shadowsocks%E5%8A%A0%E9%80%9Fgit-clone/" target="_blank" rel="noopener">用shadowsocks加速git clone</a></li>
+<li>使用<code>CompletableFuture</code>组合异步计算：其中每个以<em>Async</em>结尾的方法，都再次将任务提交给了线程池，大概率会在另外一个线程中执行；</li>
+<li>使用<code>.parallel()</code>并行处理Stream：<code>.sum()</code>对并行Stream有优化，可以提升效率；</li>
+<li>使用<code>.par</code>将<code>Vector</code>变成并行的进行<code>fold</code>：Monoid满足结合律，所以可以并行<code>fold</code>。</li>
 </ol>
+<p>承载这些异步、并行计算的线程池，默认会使用一个JVM为我们生成的<code>ForkJoinPool</code>，可以用<code>ForkJoinPool.commonPool()</code>得到实例。</p>
+<p>除此之外，Scala中的<code>scala.concurrent.Future</code>一般会使用到<code>scala.concurrent.ExecutionContext.Implicits.global</code>，而后者就是包装了这个common pool。</p>
+<a id="more"></a>
+<h2 id="forkjoinpool是个线程池？">ForkJoinPool是个线程池？</h2>
+<p>没错，<code>ForkJoinPool</code>实现了<code>ExecutorService</code>接口，是个线程池。</p>
+<p>对于common pool，我们可以看见它的默认大小：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CPU: i7-7920HQ(4 Cores, 8 Threads @3.10 GHz): </span></span><br><span class="line">System.out.println(ForkJoinPool.getCommonPoolParallelism());</span><br><span class="line"><span class="comment">// 7, the rest one is for main thread</span></span><br><span class="line"></span><br><span class="line">System.out.println(Runtime.getRuntime().availableProcessors());</span><br><span class="line"><span class="comment">// 8</span></span><br></pre></td></tr></table></figure>
+<p>相比其他线程池，<code>ForkJoinPool</code>有两个显著的特点：</p>
+<ol>
+<li>所有线程都是daemon thread，这意味着当JVM停止时，所有未完成的任务会直接终中断；</li>
+<li>work stealing策略：每个线程会有自己的deque来维护任务列表，当自己的deque空了，会从别的thread队列（或者是pool级别的deque）末尾偷任务过来执行。换句话说，每个线程都会<strong>尽可能地不让自己空闲下来</strong>。</li>
+</ol>
+<h2 id="比较好的实践">比较好的实践</h2>
+<ol>
+<li>不要提交<strong>可能阻塞</strong>的任务，这样可能阻塞所有线程，使整个线程池无法响应；</li>
+<li>如果一定要这么做（<code>ForkJoinPool</code>会先增大并发度（加线程），再处理）：
+<ul>
+<li>Java用<code>managedBlock(ForkJoinPool.ManagedBlocker blocker)</code>来替代<code>submit</code>、<code>execute</code>等</li>
+<li>Scala的<code>Future</code>使用<code>scala.concurrent.blocking</code></li>
+</ul>
+</li>
+<li>如果要sync，使用<code>CompletableFuture</code>的<code>join()</code>或者<code>CountDownLatch</code>。</li>
+</ol>
+<h2 id="另一种用法">另一种用法</h2>
+<p>上面描述的用法，主要在利用了work stealing以及common pool。</p>
+<p>仔细浏览一下<code>ForkJoinPool</code>的API，会发现有一个长得很像的类<code>ForkJoinTask</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> ForkJoinTask&lt;V&gt; <span class="title">fork</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">invokeAll</span><span class="params">(ForkJoinTask&lt;?&gt;... tasks)</span></span></span><br><span class="line"><span class="function">...</span></span><br></pre></td></tr></table></figure>
+<p><code>ForkJoinTask</code>有这么几个特点：</p>
+<ol>
+<li>可以对分治递归进行建模，拆分出来的子任务让线程池去处理；</li>
+<li>子任务可以依赖父任务，任务间依赖构成DAG；</li>
+<li>可以当成<code>Future</code>使用。</li>
+</ol>
+<p>具体实践的例子可以参考这里<a href="https://www.baeldung.com/java-fork-join" target="_blank" rel="noopener">Guide to the Fork/Join Framework in Java</a>。</p>
+<p>不过这种并发模型挺诡异的，可维护性也比较差。如果能够使用别的模型，还是尽量不要用这个。</p>
 
       
     </div>
@@ -446,11 +480,9 @@
         
         <div class="post-tags">
           
-            <a href="/tags/hexo/" rel="tag"># hexo</a>
+            <a href="/tags/Java/" rel="tag"># Java</a>
           
-            <a href="/tags/git/" rel="tag"># git</a>
-          
-            <a href="/tags/shadowsocks/" rel="tag"># shadowsocks</a>
+            <a href="/tags/Scala/" rel="tag"># Scala</a>
           
         </div>
       
@@ -463,8 +495,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/08/22/PIHex1/" rel="next" title="Programming in Haskell Chapter1 Exercises Solutions">
-                <i class="fa fa-chevron-left"></i> Programming in Haskell Chapter1 Exercises Solutions
+              <a href="/2019/10/31/monad-in-FP-part-I/" rel="next" title="Monad in FP, Part I">
+                <i class="fa fa-chevron-left"></i> Monad in FP, Part I
               </a>
             
           </div>
@@ -472,10 +504,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/08/23/PIHex2/" rel="prev" title="Programming in Haskell Chapter2 Exercises Solutions">
-                Programming in Haskell Chapter2 Exercises Solutions <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -652,7 +680,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决办法"><span class="nav-number">2.</span> <span class="nav-text">解决办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文章"><span class="nav-number">3.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#tl-dr"><span class="nav-number">1.</span> <span class="nav-text">TL;DR</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#几个栗子🌰"><span class="nav-number">2.</span> <span class="nav-text">几个栗子🌰</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#forkjoinpool是个线程池？"><span class="nav-number">3.</span> <span class="nav-text">ForkJoinPool是个线程池？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#比较好的实践"><span class="nav-number">4.</span> <span class="nav-text">比较好的实践</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#另一种用法"><span class="nav-number">5.</span> <span class="nav-text">另一种用法</span></a></li></ol></div>
             
 
           </div>

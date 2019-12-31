@@ -99,18 +99,18 @@
   };
 </script>
 
-  <meta name="description" content="¶前言 在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。 这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。 运行环境： IDE：DrRacket">
+  <meta name="description" content="前言 在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。 这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。 运行环境： IDE：DrRacket">
 <meta name="keywords" content="Scheme,Y combinator">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Yet Another a Introduction to Y Combinator in Scheme">
 <meta property="og:url" content="http://duanyifu.com/2017/05/02/ycombinator-in-scheme/index.html">
 <meta property="og:site_name" content="Yifu&#39;s Blog">
-<meta property="og:description" content="¶前言 在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。 这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。 运行环境： IDE：DrRacket">
+<meta property="og:description" content="前言 在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。 这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。 运行环境： IDE：DrRacket">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2019-07-28T14:08:22.075Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Yet Another a Introduction to Y Combinator in Scheme">
-<meta name="twitter:description" content="¶前言 在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。 这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。 运行环境： IDE：DrRacket">
+<meta name="twitter:description" content="前言 在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。 这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。 运行环境： IDE：DrRacket">
 
 
 
@@ -403,13 +403,13 @@
       
 
       
-        <h3 id="前言"><a class="header-anchor" href="#前言">¶</a>前言</h3>
+        <h3 id="前言">前言</h3>
 <p>在Lambda演算中，函数是没有名字的（都是匿名函数），那么如果函数没有名字，也就无法在函数体内显式地调用自身，也就无法定义递归函数，Y combinator就是用来解决这个问题的。<br>
 这篇文章想抛开那些数学概念，用程序语言（Scheme）的形式来讲解我们是如何推导出Y combinator的。</p>
 <p>运行环境：<br>
 IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket</a></p>
 <a id="more"></a>
-<h3 id="什么是递归函数？"><a class="header-anchor" href="#什么是递归函数？">¶</a>什么是递归函数？</h3>
+<h3 id="什么是递归函数？">什么是递归函数？</h3>
 <p>我们以递归函数<code>length</code>为例，<code>length</code>函数接受一个list，返回list的元素数目。</p>
 <figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name"><span class="builtin-name">define</span></span> length</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br></pre></td></tr></table></figure>
 <p><strong>若你熟悉Scheme函数定义，可以跳过本小结后面部分。</strong></p>
@@ -422,7 +422,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
 <p><code>rest</code>返回<code>lst</code>去掉第一个元素的剩余部分，其实就是<code>(define rest cdr)</code>。<br>
 也就是说，<code>length</code>函数接受一个list，若list为空，则返回<code>0</code>，若list非空，则求去掉第一个元素的list长度，并将其加一。求值过程如下：</p>
 <figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name"><span class="builtin-name">length</span></span> `(<span class="number">1</span> <span class="number">2</span>)) <span class="comment">; `(1 2) is a list has two elements</span></span><br><span class="line">(<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> `(<span class="number">2</span>))) <span class="comment">; `(2) is (rest `(1 2))</span></span><br><span class="line">(<span class="name">add1</span> (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> `()))) <span class="comment">; `() is empty list</span></span><br><span class="line">(<span class="name">add1</span> (<span class="name">add1</span> <span class="number">0</span>))</span><br><span class="line">(<span class="name">add1</span> <span class="number">1</span>)</span><br><span class="line"><span class="number">2</span></span><br></pre></td></tr></table></figure>
-<h3 id="假如length没有名字？"><a class="header-anchor" href="#假如length没有名字？">¶</a>假如length没有名字？</h3>
+<h3 id="假如length没有名字？">假如length没有名字？</h3>
 <p>如果我们去掉<code>define</code>，拿出其中的函数定义，是这样。</p>
 <figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))) <span class="comment">; length is undefined</span></span><br></pre></td></tr></table></figure>
 <p>**WAIT！！**既然现在没有了<code>length</code>,显然我们也无法在函数体内调用<code>length</code>了。<br>
@@ -449,7 +449,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
 <li>若list长度大于0，无法工作</li>
 </ul>
 <p>那么，我们将这个函数叫做<code>length0</code>,代表它对长度为0及0以下（并不存在）的list可以正常工作。</p>
-<h3 id="length1-length2-and"><a class="header-anchor" href="#length1-length2-and">¶</a>length1, length2, and …</h3>
+<h3 id="length1-length2-and">length1, length2, and …</h3>
 <p>好了，我们现在有一个<code>length0</code>，可以求出空表的长度。<br>
 那么下面这个函数有什么作用呢？</p>
 <figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length1</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name">length0</span> (<span class="name">rest</span> lst)))))</span><br></pre></td></tr></table></figure>
@@ -466,7 +466,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
 依此类推，我们能定义出<code>length3</code>、<code>length4</code>、<code>length5</code>,甚至<code>length100</code>、<code>length1000</code>、<code>length10000</code>了！<br>
 那么如果我们能写出<code>length∞</code>，不就得到了我们的原始<code>length</code>函数了吗，因为<code>length</code>是可以处理任意长度的list的函数！<br>
 但是，我们没办法写出<code>length∞</code>，因为无穷行代码哪里也放不下啊！（笑</p>
-<h3 id="试着进行抽象"><a class="header-anchor" href="#试着进行抽象">¶</a>试着进行抽象</h3>
+<h3 id="试着进行抽象">试着进行抽象</h3>
 <p>试着观察<code>length0</code> <code>length1</code> <code>length2</code>，我们会发现，这三个函数都遵循相同的形式，只有<code>last-length</code>这个地方是需要改变的：</p>
 <figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; same pattern</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst)))))</span><br></pre></td></tr></table></figure>
 <p>根据DRY原则，我们为什么不把相同的形式给抽象出来呢？<br>
@@ -485,7 +485,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
 <figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length2</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> ((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> ((<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br><span class="line"> (<span class="name">id</span>))))</span><br></pre></td></tr></table></figure>
 <p>**WAIT!!!**这难道不是依然在重复增加代码吗？<br>
 好吧，其实我们还是有所推进，别急，慢慢来。</p>
-<h3 id="返回length函数的函数：make-length"><a class="header-anchor" href="#返回length函数的函数：make-length">¶</a>返回length函数的函数：make-length</h3>
+<h3 id="返回length函数的函数：make-length">返回length函数的函数：make-length</h3>
 <p>按照我们刚刚的抽象，<code>abstract-length</code>：</p>
 <figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; abstract-length</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (last-length)</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name">last-length</span> (<span class="name">rest</span> lst))))))</span><br></pre></td></tr></table></figure>
 <p>对于这个函数，我们如果：</p>
@@ -517,7 +517,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
 <li><code>length3</code>: (make-length (make-length (make-length (make-length id))))</li>
 </ul>
 <p>是不是有点类似汉诺塔？</p>
-<h3 id="快到终点了"><a class="header-anchor" href="#快到终点了">¶</a>快到终点了</h3>
+<h3 id="快到终点了">快到终点了</h3>
 <p>事实上，每当我们使用<code>length</code>函数，我们并不会给它一个无限长的list。<br>
 那么，只要我们用一个足够大的<code>length[i]</code>，可不可行呢？按照我们上一小节的抽象，我们可以轻易地写出<code>length100</code>，甚至<code>length10000000000000000</code>。<br>
 问题在于，这个足够大的数，仍然可能不够大。</p>
@@ -550,7 +550,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
 <p>很好，我们得到了一个能工作的<code>length1</code>，事实上，这已经不再是<code>length1</code>了，因为它能处理长度为2的list！甚至更长的！<br>
 这就和我们最初的<code>length</code>一样了！</p>
 <p>（如果你不明白这里的<code>length1</code>为何能工作，可以试着再读一读这两个小节，或者手动推演一下这个lambda式子）</p>
-<h3 id="不止应用于length"><a class="header-anchor" href="#不止应用于length">¶</a>不止应用于length</h3>
+<h3 id="不止应用于length">不止应用于length</h3>
 <p>对比一下我们的显式递归<code>length</code>和<code>newlength</code>:</p>
 <figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; length</span></span><br><span class="line">(<span class="name"><span class="builtin-name">define</span></span> length</span><br><span class="line">  (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">    (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">        <span class="number">0</span></span><br><span class="line">        (<span class="name">add1</span> (<span class="name"><span class="builtin-name">length</span></span> (<span class="name">rest</span> lst))))))</span><br><span class="line"></span><br><span class="line"><span class="comment">; newlength</span></span><br><span class="line">((<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name">make-length</span> make-length))</span><br><span class="line"> (<span class="name"><span class="builtin-name">lambda</span></span> (make-length)</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (lst)</span><br><span class="line">     (<span class="name"><span class="builtin-name">if</span></span> (<span class="name"><span class="builtin-name">null?</span></span> lst)</span><br><span class="line">         <span class="number">0</span></span><br><span class="line">         (<span class="name">add1</span> ((<span class="name">make-length</span> make-length) (<span class="name">rest</span> lst)))))))</span><br></pre></td></tr></table></figure>
 <p>这两个定义在形式上还是有差别，因为前者定义中的<code>(length (rest lst))</code>，在后者定义中变成了<code>((make-length make-length) (rest lst))</code>。</p>
@@ -587,9 +587,9 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
 化简一下：</p>
 <figure class="highlight scheme"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">; applicative-order Y combinator</span></span><br><span class="line">(<span class="name"><span class="builtin-name">lambda</span></span> (func)</span><br><span class="line">  ((<span class="name"><span class="builtin-name">lambda</span></span> (f)</span><br><span class="line">     (<span class="name">f</span> f))</span><br><span class="line">   (<span class="name"><span class="builtin-name">lambda</span></span> (f)</span><br><span class="line">     (<span class="name">func</span> (<span class="name"><span class="builtin-name">lambda</span></span> (x)</span><br><span class="line">             ((<span class="name">f</span> f) x))))))</span><br></pre></td></tr></table></figure>
 <p>有了Y combinator，我们就能从匿名函数中定义递归函数了！</p>
-<h3 id="练习"><a class="header-anchor" href="#练习">¶</a>练习</h3>
+<h3 id="练习">练习</h3>
 <p>你能写出一个简单的阶乘函数<code>factorial</code>，然后用Y combinator将其变成匿名递归函数吗？</p>
-<h3 id="参考"><a class="header-anchor" href="#参考">¶</a>参考</h3>
+<h3 id="参考">参考</h3>
 <ol>
 <li><a href="https://www.amazon.com/Little-Schemer-Daniel-P-Friedman/dp/0262560992" target="_blank" rel="noopener"><em>The Little Schemer</em></a></li>
 <li><a href="https://en.wikipedia.org/wiki/Fixed-point_combinator" target="_blank" rel="noopener">Fixed-point combinator - Wikipidia</a></li>
@@ -720,7 +720,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -829,7 +829,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">¶前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是递归函数？"><span class="nav-number">2.</span> <span class="nav-text">¶什么是递归函数？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#假如length没有名字？"><span class="nav-number">3.</span> <span class="nav-text">¶假如length没有名字？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#length1-length2-and"><span class="nav-number">4.</span> <span class="nav-text">¶length1, length2, and …</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#试着进行抽象"><span class="nav-number">5.</span> <span class="nav-text">¶试着进行抽象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#返回length函数的函数：make-length"><span class="nav-number">6.</span> <span class="nav-text">¶返回length函数的函数：make-length</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快到终点了"><span class="nav-number">7.</span> <span class="nav-text">¶快到终点了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不止应用于length"><span class="nav-number">8.</span> <span class="nav-text">¶不止应用于length</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#练习"><span class="nav-number">9.</span> <span class="nav-text">¶练习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">10.</span> <span class="nav-text">¶参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是递归函数？"><span class="nav-number">2.</span> <span class="nav-text">什么是递归函数？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#假如length没有名字？"><span class="nav-number">3.</span> <span class="nav-text">假如length没有名字？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#length1-length2-and"><span class="nav-number">4.</span> <span class="nav-text">length1, length2, and …</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#试着进行抽象"><span class="nav-number">5.</span> <span class="nav-text">试着进行抽象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#返回length函数的函数：make-length"><span class="nav-number">6.</span> <span class="nav-text">返回length函数的函数：make-length</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快到终点了"><span class="nav-number">7.</span> <span class="nav-text">快到终点了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不止应用于length"><span class="nav-number">8.</span> <span class="nav-text">不止应用于length</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#练习"><span class="nav-number">9.</span> <span class="nav-text">练习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">10.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>

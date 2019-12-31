@@ -99,19 +99,19 @@
   };
 </script>
 
-  <meta name="description" content="¶基础准备  Haskell (我选择的是Haskell Platform 8.0.1) Sublime Text Package Control: The Sublime Text package manager  ¶安装插件 ¶SublimeHaskell 在Package Control中安装SublimeHaskell。 插件安装完成后，重启Sublime报错，提示需要安装hsdev ca">
+  <meta name="description" content="基础准备  Haskell (我选择的是Haskell Platform 8.0.1) Sublime Text Package Control: The Sublime Text package manager  安装插件 SublimeHaskell 在Package Control中安装SublimeHaskell。 插件安装完成后，重启Sublime报错，提示需要安装hsdev cabal">
 <meta name="keywords" content="Haskell,Sublime">
 <meta property="og:type" content="article">
 <meta property="og:title" content="用Sublime Text写Haskell">
 <meta property="og:url" content="http://duanyifu.com/2016/08/24/write-haskell-with-sublime/index.html">
 <meta property="og:site_name" content="Yifu&#39;s Blog">
-<meta property="og:description" content="¶基础准备  Haskell (我选择的是Haskell Platform 8.0.1) Sublime Text Package Control: The Sublime Text package manager  ¶安装插件 ¶SublimeHaskell 在Package Control中安装SublimeHaskell。 插件安装完成后，重启Sublime报错，提示需要安装hsdev ca">
+<meta property="og:description" content="基础准备  Haskell (我选择的是Haskell Platform 8.0.1) Sublime Text Package Control: The Sublime Text package manager  安装插件 SublimeHaskell 在Package Control中安装SublimeHaskell。 插件安装完成后，重启Sublime报错，提示需要安装hsdev cabal">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://ocdmsdl3m.bkt.clouddn.com/sublime_haskell_1.png">
 <meta property="og:updated_time" content="2016-08-23T20:00:47.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用Sublime Text写Haskell">
-<meta name="twitter:description" content="¶基础准备  Haskell (我选择的是Haskell Platform 8.0.1) Sublime Text Package Control: The Sublime Text package manager  ¶安装插件 ¶SublimeHaskell 在Package Control中安装SublimeHaskell。 插件安装完成后，重启Sublime报错，提示需要安装hsdev ca">
+<meta name="twitter:description" content="基础准备  Haskell (我选择的是Haskell Platform 8.0.1) Sublime Text Package Control: The Sublime Text package manager  安装插件 SublimeHaskell 在Package Control中安装SublimeHaskell。 插件安装完成后，重启Sublime报错，提示需要安装hsdev cabal">
 <meta name="twitter:image" content="http://ocdmsdl3m.bkt.clouddn.com/sublime_haskell_1.png">
 
 
@@ -395,14 +395,14 @@
       
 
       
-        <h3 id="基础准备"><a class="header-anchor" href="#基础准备">¶</a>基础准备</h3>
+        <h3 id="基础准备">基础准备</h3>
 <ul>
 <li><a href="https://www.haskell.org/downloads" target="_blank" rel="noopener">Haskell</a> (我选择的是Haskell Platform 8.0.1)</li>
 <li><a href="https://www.sublimetext.com/3" target="_blank" rel="noopener">Sublime Text</a></li>
 <li><a href="https://packagecontrol.io/installation" target="_blank" rel="noopener">Package Control: The Sublime Text package manager</a></li>
 </ul>
-<h3 id="安装插件"><a class="header-anchor" href="#安装插件">¶</a>安装插件</h3>
-<h4 id="sublimehaskell"><a class="header-anchor" href="#sublimehaskell">¶</a>SublimeHaskell</h4>
+<h3 id="安装插件">安装插件</h3>
+<h4 id="sublimehaskell">SublimeHaskell</h4>
 <p>在Package Control中安装SublimeHaskell。<br>
 插件安装完成后，重启Sublime报错，提示需要安装hsdev cabal package。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SublimeHaskell: hsdev executable couldn&apos;t be found!</span><br><span class="line">It&apos;s used in most features of SublimeHaskell</span><br><span class="line">Check if it&apos;s installed and in PATH</span><br><span class="line">If it&apos;s not installed, run &apos;cabal install hsdev&apos; to install hsdev</span><br><span class="line">You may also want to adjust &apos;add_to_PATH&apos; setting</span><br></pre></td></tr></table></figure>
@@ -419,28 +419,28 @@
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"add_to_PATH"</span>:</span><br><span class="line">    [</span><br><span class="line">        <span class="string">"/Users/mist/Library/Haskell/bin"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"enable_ghc_mod"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"enable_hdevtools"</span>: <span class="literal">false</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 <p><strong>注意：文件中的路径应当修改为你自己的路径，可以用<code>cat ~/.cabal/where-is-my-stuff.txt</code>查看。</strong></p>
 <p>再次重启sublime，这次没有报错。</p>
-<h4 id="sublimerepl"><a class="header-anchor" href="#sublimerepl">¶</a>SublimeREPL</h4>
+<h4 id="sublimerepl">SublimeREPL</h4>
 <p>在Package Control中安装SublimeREPL。<br>
 这个插件可以直接新建一个tab用来跑GHCi，配合<code>View -&gt; Layout -&gt; Coloum: 2</code>使用，方便开发与调试。</p>
-<h4 id="stylish-haskell"><a class="header-anchor" href="#stylish-haskell">¶</a>stylish-haskell</h4>
+<h4 id="stylish-haskell">stylish-haskell</h4>
 <p>有待研究。</p>
-<h3 id="测试一下"><a class="header-anchor" href="#测试一下">¶</a>测试一下</h3>
-<h4 id="自带build-system可以使用"><a class="header-anchor" href="#自带build-system可以使用">¶</a>自带Build System可以使用</h4>
+<h3 id="测试一下">测试一下</h3>
+<h4 id="自带build-system可以使用">自带Build System可以使用</h4>
 <p><code>Tools -&gt; Build System -&gt; Automatic 或 Haskell</code><br>
 直接运行当前文件。<br>
 <img src="http://ocdmsdl3m.bkt.clouddn.com/sublime_haskell_1.png" alt="sublime build system"></p>
-<h4 id="sublimehaskell常用命令"><a class="header-anchor" href="#sublimehaskell常用命令">¶</a>SublimeHaskell常用命令</h4>
+<h4 id="sublimehaskell常用命令">SublimeHaskell常用命令</h4>
 <p>显示声明位置：<code>f12</code><br>
 详细声明文档：<code>ctrl+k ctrl+i</code><br>
 显示类型：<code>ctrl+k ctrl+h ctrl+t</code><br>
 插入类型：<code>ctrl+k ctrl+i ctrl+i</code><br>
 当然，也可以用<code>command+shift+p</code>调用这些命令。</p>
-<h4 id="sublimerepl-v2"><a class="header-anchor" href="#sublimerepl-v2">¶</a>SublimeREPL</h4>
+<h4 id="sublimerepl-v2">SublimeREPL</h4>
 <p>不用额外配置，通过<code>Tools -&gt; SublimeREPL -&gt; Haskell</code>可以直接打开GHCi。</p>
-<h3 id="总结"><a class="header-anchor" href="#总结">¶</a>总结</h3>
+<h3 id="总结">总结</h3>
 <p>生命不息，折腾不止，终于可以愉快地敲haskell啦~<br>
 主要的坑都在cabal上，cabal这个包管理比起 pip npm 啥的实在太弱了，连uninstall都没有！(敲<code>cabal uninstall</code>会告诉你以后会加上这个功能的。。。)</p>
-<h3 id="参考"><a class="header-anchor" href="#参考">¶</a>参考</h3>
+<h3 id="参考">参考</h3>
 <ol>
 <li><a href="https://github.com/SublimeHaskell/SublimeHaskell" target="_blank" rel="noopener">SublimeHaskell GitHub repo</a></li>
 <li><a href="http://tonylawrence.com/2014/01/01/configuring-your-haskell-environment/" target="_blank" rel="noopener">Configuring your Haskell environment</a></li>
@@ -572,7 +572,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -681,7 +681,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础准备"><span class="nav-number">1.</span> <span class="nav-text">¶基础准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装插件"><span class="nav-number">2.</span> <span class="nav-text">¶安装插件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sublimehaskell"><span class="nav-number">2.1.</span> <span class="nav-text">¶SublimeHaskell</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sublimerepl"><span class="nav-number">2.2.</span> <span class="nav-text">¶SublimeREPL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stylish-haskell"><span class="nav-number">2.3.</span> <span class="nav-text">¶stylish-haskell</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试一下"><span class="nav-number">3.</span> <span class="nav-text">¶测试一下</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#自带build-system可以使用"><span class="nav-number">3.1.</span> <span class="nav-text">¶自带Build System可以使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sublimehaskell常用命令"><span class="nav-number">3.2.</span> <span class="nav-text">¶SublimeHaskell常用命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sublimerepl-v2"><span class="nav-number">3.3.</span> <span class="nav-text">¶SublimeREPL</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">¶总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">¶参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础准备"><span class="nav-number">1.</span> <span class="nav-text">基础准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装插件"><span class="nav-number">2.</span> <span class="nav-text">安装插件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sublimehaskell"><span class="nav-number">2.1.</span> <span class="nav-text">SublimeHaskell</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sublimerepl"><span class="nav-number">2.2.</span> <span class="nav-text">SublimeREPL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stylish-haskell"><span class="nav-number">2.3.</span> <span class="nav-text">stylish-haskell</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试一下"><span class="nav-number">3.</span> <span class="nav-text">测试一下</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#自带build-system可以使用"><span class="nav-number">3.1.</span> <span class="nav-text">自带Build System可以使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sublimehaskell常用命令"><span class="nav-number">3.2.</span> <span class="nav-text">SublimeHaskell常用命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sublimerepl-v2"><span class="nav-number">3.3.</span> <span class="nav-text">SublimeREPL</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>

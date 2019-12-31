@@ -99,18 +99,18 @@
   };
 </script>
 
-  <meta name="description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  ¶给出double (double 2)的另外一种可能解释。 书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。 1234567double (double 2)= double 2 + double 2= double 2">
+  <meta name="description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  给出double (double 2)的另外一种可能解释。 书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。 1234567double (double 2)= double 2 + double 2= double 2">
 <meta name="keywords" content="Haskell,Programming in Haskell">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Programming in Haskell Chapter1 Exercises Solutions">
 <meta property="og:url" content="http://duanyifu.com/2016/08/22/PIHex1/index.html">
 <meta property="og:site_name" content="Yifu&#39;s Blog">
-<meta property="og:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  ¶给出double (double 2)的另外一种可能解释。 书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。 1234567double (double 2)= double 2 + double 2= double 2">
+<meta property="og:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  给出double (double 2)的另外一种可能解释。 书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。 1234567double (double 2)= double 2 + double 2= double 2">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2016-08-28T15:47:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Programming in Haskell Chapter1 Exercises Solutions">
-<meta name="twitter:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  ¶给出double (double 2)的另外一种可能解释。 书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。 1234567double (double 2)= double 2 + double 2= double 2">
+<meta name="twitter:description" content="Programming in Haskell是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在这里。  给出double (double 2)的另外一种可能解释。 书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。 1234567double (double 2)= double 2 + double 2= double 2">
 
 
 
@@ -405,24 +405,24 @@
       
         <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="给出double-double-2-的另外一种可能解释"><a class="header-anchor" href="#给出double-double-2-的另外一种可能解释">¶</a>给出<code>double (double 2)</code>的另外一种可能解释。</h4>
+<h4 id="给出double-double-2-的另外一种可能解释">给出<code>double (double 2)</code>的另外一种可能解释。</h4>
 <p>书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">double</span> (double <span class="number">2</span>)</span><br><span class="line">= double <span class="number">2</span> + double <span class="number">2</span></span><br><span class="line">= double <span class="number">2</span> + (<span class="number">2</span> + <span class="number">2</span>)</span><br><span class="line">= double <span class="number">2</span> + <span class="number">4</span></span><br><span class="line">= (<span class="number">2</span> + <span class="number">2</span>) + <span class="number">4</span></span><br><span class="line">= <span class="number">4</span> + <span class="number">4</span></span><br><span class="line">= <span class="number">8</span></span><br></pre></td></tr></table></figure>
 <a id="more"></a>
-<h4 id="解释sum-x-的求值过程"><a class="header-anchor" href="#解释sum-x-的求值过程">¶</a>解释<code>sum [x]</code>的求值过程。</h4>
+<h4 id="解释sum-x-的求值过程">解释<code>sum [x]</code>的求值过程。</h4>
 <p>sum的定义：</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">sum</span> [] = <span class="number">0</span></span><br><span class="line"><span class="title">sum</span> (x:xs) = x + sum xs</span><br></pre></td></tr></table></figure>
 <p>sum [x] 求值过程：</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">sum</span> [x]</span><br><span class="line">= x + sum []</span><br><span class="line">= x + <span class="number">0</span></span><br><span class="line">= x</span><br></pre></td></tr></table></figure>
-<h4 id="定义product"><a class="header-anchor" href="#定义product">¶</a>定义<code>product</code>。</h4>
+<h4 id="定义product">定义<code>product</code>。</h4>
 <p>仿照sum的定义，将product定义如下：</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">product</span> []     = <span class="number">1</span></span><br><span class="line"><span class="title">product</span> (x:xs) = x * sum xs</span><br></pre></td></tr></table></figure>
 <p>product [2, 3, 4]求值过程：</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">product</span> [<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]</span><br><span class="line">= <span class="number">2</span> * product [<span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line">= <span class="number">2</span> * <span class="number">3</span> * product [<span class="number">4</span>]</span><br><span class="line">= <span class="number">2</span> * <span class="number">3</span> * <span class="number">4</span> * product []</span><br><span class="line">= <span class="number">2</span> * <span class="number">3</span> * <span class="number">4</span> * <span class="number">1</span></span><br><span class="line">= <span class="number">24</span></span><br></pre></td></tr></table></figure>
-<h4 id="将qsort改成输出倒序的"><a class="header-anchor" href="#将qsort改成输出倒序的">¶</a>将<code>qsort</code>改成输出倒序的。</h4>
+<h4 id="将qsort改成输出倒序的">将<code>qsort</code>改成输出倒序的。</h4>
 <p>将课本中的例子larger和smaller交换即可。</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- qsort.hs</span></span><br><span class="line"><span class="title">qsort</span> [] = []</span><br><span class="line"><span class="title">qsort</span> (x:xs) = qsort larger ++ [x] ++ qsort smaller</span><br><span class="line">               <span class="keyword">where</span></span><br><span class="line">                larger = [a | a &lt;- xs, a &gt; x]</span><br><span class="line">                smaller = [b | b &lt;- xs, b &lt;= x]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">--- *Main&gt; qsort [3,5,1,4,2]</span></span><br><span class="line"><span class="comment">--- [5,4,3,2,1]</span></span><br></pre></td></tr></table></figure>
-<h4 id="将qsort定义中的-换成-会如何"><a class="header-anchor" href="#将qsort定义中的-换成-会如何">¶</a>将<code>qsort</code>定义中的<code>&lt;=</code>换成<code>&lt;</code>会如何。</h4>
+<h4 id="将qsort定义中的-换成-会如何">将<code>qsort</code>定义中的<code>&lt;=</code>换成<code>&lt;</code>会如何。</h4>
 <p>若将<code>&lt;=</code>换成<code>&lt;</code>，则与<code>x</code>相等的元素将会丢失。</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*<span class="type">Main</span>&gt; qsort [<span class="number">2</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">1</span>]</span><br><span class="line">[<span class="number">3</span>,<span class="number">3</span>,<span class="number">2</span>,<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">this</span></span><br></pre></td></tr></table></figure>
@@ -547,7 +547,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -656,7 +656,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#给出double-double-2-的另外一种可能解释"><span class="nav-number">1.</span> <span class="nav-text">¶给出double (double 2)的另外一种可能解释。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解释sum-x-的求值过程"><span class="nav-number">2.</span> <span class="nav-text">¶解释sum [x]的求值过程。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定义product"><span class="nav-number">3.</span> <span class="nav-text">¶定义product。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将qsort改成输出倒序的"><span class="nav-number">4.</span> <span class="nav-text">¶将qsort改成输出倒序的。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将qsort定义中的-换成-会如何"><span class="nav-number">5.</span> <span class="nav-text">¶将qsort定义中的&lt;=换成&lt;会如何。</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#给出double-double-2-的另外一种可能解释"><span class="nav-number">1.</span> <span class="nav-text">给出double (double 2)的另外一种可能解释。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解释sum-x-的求值过程"><span class="nav-number">2.</span> <span class="nav-text">解释sum [x]的求值过程。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定义product"><span class="nav-number">3.</span> <span class="nav-text">定义product。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将qsort改成输出倒序的"><span class="nav-number">4.</span> <span class="nav-text">将qsort改成输出倒序的。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将qsort定义中的-换成-会如何"><span class="nav-number">5.</span> <span class="nav-text">将qsort定义中的&lt;=换成&lt;会如何。</span></a></li></ol></div>
             
 
           </div>

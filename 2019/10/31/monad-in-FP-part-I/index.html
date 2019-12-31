@@ -100,7 +100,7 @@
 </script>
 
   <meta name="description" content="Monad ---- “the m-word”，“a monoid in the category of endofunctors”. see A monad is just a monoid in the category of endofunctors, what’s the problem? for fun  在FP的路上，不可避免地会碰到monad这个拦路虎。绕是绕不过去的，那就学咯。 “">
-<meta name="keywords" content="Functional Programming,Scala,Monad">
+<meta name="keywords" content="Scala,Functional Programming,Monad">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Monad in FP, Part I">
 <meta property="og:url" content="http://duanyifu.com/2019/10/31/monad-in-FP-part-I/index.html">
@@ -399,19 +399,19 @@
 <p>在FP的路上，不可避免地会碰到monad这个拦路虎。绕是绕不过去的，那就学咯。</p>
 <p><em>“我看了几十篇关于monad的文章，还是没懂。” – 某不知名FP爱好者</em></p>
 <p>这篇文章也不是silver bullet，我只希望读者在读过以后，对monad能有个大致的、模糊的印象，今后能够持续地从多个角度去审视这个概念，加深认识。</p>
-<h2 id="什么是monad"><a class="header-anchor" href="#什么是monad">¶</a>什么是monad</h2>
+<h2 id="什么是monad">什么是monad</h2>
 <p>我们在说functor的时候，有一个不那么准确的定义：<strong>有<code>map</code>的，就是functor</strong>。</p>
 <p>当我们这样定义的时候，我们其实是在泛化<code>map</code>，将它们的共性抽象出来，这个抽象就是functor。</p>
 <p>同样地，<code>flatMap</code>也出现在很多地方（比如<code>List</code>，<code>Option</code>，<code>Future</code>，<code>Either</code>等等等），我们自然也想把共性抽象出来，这个抽象，就是monad。所以可以类似地说：<strong>有<code>flatMap</code>的，就是monad</strong>。</p>
 <p>好吧，如果要正式一点，引用下<em>scala with cats</em>里的定义：<strong>monad是一种将计算按顺序排列起来的机制（a mechanism for sequencing computations）</strong>。</p>
 <a id="more"></a>
-<h2 id="flatmap是什么"><a class="header-anchor" href="#flatmap是什么">¶</a><code>flatMap</code>是什么</h2>
+<h2 id="flatmap是什么"><code>flatMap</code>是什么</h2>
 <p>如果你熟悉<code>flatMap</code>，可以跳过这一小节。</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span>(<span class="params">name: <span class="type">String</span>, friends: <span class="type">List</span>[<span class="type">String</span>]</span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">val</span> <span class="title">bob</span> </span>= <span class="type">Person</span>(<span class="string">"Bob"</span>, <span class="type">List</span>(<span class="string">"Alice"</span>, <span class="string">"Pika"</span>))</span><br><span class="line"><span class="comment">// bob: Person = Person("Bob", List("Alice", "Pika"))</span></span><br><span class="line"><span class="keyword">val</span> harry = <span class="type">Person</span>(<span class="string">"Harry"</span>, <span class="type">List</span>(<span class="string">"Ron"</span>, <span class="string">"Hermione"</span>))</span><br><span class="line"><span class="comment">// harry: Person = Person("Harry", List("Ron", "Hermione"))</span></span><br><span class="line"><span class="keyword">val</span> ps = <span class="type">List</span>(bob, harry)</span><br><span class="line"><span class="comment">// ps: List[Person] = List(Person("Bob", List("Alice", "Pika")), Person("Harry", List("Ron", "Hermione")))</span></span><br><span class="line"></span><br><span class="line">ps.map(_.friends)</span><br><span class="line"><span class="comment">// res4: List[List[String]] = List(List("Alice", "Pika"), List("Ron", "Hermione"))</span></span><br><span class="line"></span><br><span class="line">ps.flatMap(_.friends)</span><br><span class="line"><span class="comment">// res5: List[String] = List("Alice", "Pika", "Ron", "Hermione")</span></span><br></pre></td></tr></table></figure>
 <p>对于<code>List[A]</code>来说，<code>map</code>和<code>flatMap</code>的签名，仅仅是传入的<code>f</code>的返回类型不一样：</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">List</span>[<span class="type">B</span>]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">flatMap</span></span>[<span class="type">A</span>, <span class="type">B</span>](f: <span class="type">A</span> =&gt; <span class="type">List</span>[<span class="type">B</span>]): <span class="type">List</span>[<span class="type">B</span>]</span><br></pre></td></tr></table></figure>
 <p>直观来讲，<code>flatMap</code>将<code>List</code>内的每一个A，转换成了一个<code>List[B]</code>，然后将所有的<code>List[B]</code>，连了起来。</p>
-<h2 id="举个栗子🌰"><a class="header-anchor" href="#举个栗子🌰">¶</a>举个栗子🌰</h2>
+<h2 id="举个栗子🌰">举个栗子🌰</h2>
 <p>我们知道，<code>Option</code>可以用来表示结果是否存在。</p>
 <p>考虑整数除法：</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// not pure, can throw exception</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">naiveDiv</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>): <span class="type">Int</span> = x / y</span><br><span class="line"></span><br><span class="line">naiveDiv(<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line"><span class="comment">// java.lang.ArithmeticException: / by zero</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// pure</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">div</span></span>(x: <span class="type">Int</span>, y: <span class="type">Int</span>): <span class="type">Option</span>[<span class="type">Int</span>] = </span><br><span class="line">  <span class="keyword">if</span> (y == <span class="number">0</span>) <span class="type">None</span> <span class="keyword">else</span> <span class="type">Some</span>(x / y)</span><br><span class="line"></span><br><span class="line">div(<span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line"><span class="comment">// res13: Option[Int] = None</span></span><br><span class="line">div(<span class="number">8</span>, <span class="number">2</span>)</span><br><span class="line"><span class="comment">// res14: Option[Int] = Some(4)</span></span><br></pre></td></tr></table></figure>
@@ -456,7 +456,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="monad的定义"><a class="header-anchor" href="#monad的定义">¶</a><code>Monad</code>的定义</h2>
+<h2 id="monad的定义"><code>Monad</code>的定义</h2>
 <p>在上述的例子中，我们使用<code>flatMap</code>将<code>Option[Int]</code>串了起来。</p>
 <p>如果我们只有<code>Int</code>，<code>flatMap</code>岂不是毫无作用？</p>
 <p>没关系，我们还有<code>unit</code>，可以把一个值<code>A</code>变成<code>F[A]</code>，可以视作将一个纯粹的值提升到了monad上下文中。</p>
@@ -465,17 +465,17 @@
 <p>因为我们可以使用<code>unit</code>和<code>flatMap</code>实现<code>map</code>，有了<code>map</code>，自然就是functor。</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](ma: <span class="type">F</span>[<span class="type">A</span>])(f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">F</span>[<span class="type">B</span>] = ???</span><br></pre></td></tr></table></figure>
 <p>这个实现是显然且唯一的，答案在文章末尾。</p>
-<h2 id="小结"><a class="header-anchor" href="#小结">¶</a>小结</h2>
+<h2 id="小结">小结</h2>
 <p>这次我们通过一个简单的例子阐述了monad的作用，并写下了monad的一种形式化定义。</p>
 <p>接下来，我们还会研究monad定律，研究monad的不同表现形式。</p>
 <p>最后，我们会研究大量的monad实例，来加深理解。</p>
-<h2 id="reference"><a class="header-anchor" href="#reference">¶</a>Reference</h2>
+<h2 id="reference">Reference</h2>
 <ol>
 <li><a href="https://bartoszmilewski.com/2016/11/21/monads-programmers-definition/" target="_blank" rel="noopener">Monads: Programmer’s Definition</a></li>
 <li><a href="https://underscore.io/books/scala-with-cats/" target="_blank" rel="noopener">Monads – Chapter 3 in <em>Scala with Cats</em></a></li>
 <li><a href="https://www.manning.com/books/functional-programming-in-scala" target="_blank" rel="noopener">Monad – Chapter 11 in <em>Functional Programming in Scala</em></a></li>
 </ol>
-<h2 id="答案：通过unit和flatmap实现map"><a class="header-anchor" href="#答案：通过unit和flatmap实现map">¶</a>答案：通过<code>unit</code>和<code>flatMap</code>实现<code>map</code></h2>
+<h2 id="答案：通过unit和flatmap实现map">答案：通过<code>unit</code>和<code>flatMap</code>实现<code>map</code></h2>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">map</span></span>[<span class="type">A</span>, <span class="type">B</span>](ma: <span class="type">F</span>[<span class="type">A</span>])(f: <span class="type">A</span> =&gt; <span class="type">B</span>): <span class="type">F</span>[<span class="type">B</span>] = </span><br><span class="line">  flatMap(ma)(a =&gt; unit(f(a)))</span><br></pre></td></tr></table></figure>
 
       
@@ -507,9 +507,9 @@
         
         <div class="post-tags">
           
-            <a href="/tags/Functional-Programming/" rel="tag"># Functional Programming</a>
-          
             <a href="/tags/Scala/" rel="tag"># Scala</a>
+          
+            <a href="/tags/Functional-Programming/" rel="tag"># Functional Programming</a>
           
             <a href="/tags/Monad/" rel="tag"># Monad</a>
           
@@ -533,6 +533,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/30/ForkJoinPool/" rel="prev" title="ForkJoinPool简介">
+                ForkJoinPool简介 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -600,7 +604,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -709,7 +713,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是monad"><span class="nav-number">1.</span> <span class="nav-text">¶什么是monad</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#flatmap是什么"><span class="nav-number">2.</span> <span class="nav-text">¶flatMap是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#举个栗子🌰"><span class="nav-number">3.</span> <span class="nav-text">¶举个栗子🌰</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monad的定义"><span class="nav-number">4.</span> <span class="nav-text">¶Monad的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">¶小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reference"><span class="nav-number">6.</span> <span class="nav-text">¶Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#答案：通过unit和flatmap实现map"><span class="nav-number">7.</span> <span class="nav-text">¶答案：通过unit和flatMap实现map</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是monad"><span class="nav-number">1.</span> <span class="nav-text">什么是monad</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#flatmap是什么"><span class="nav-number">2.</span> <span class="nav-text">flatMap是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#举个栗子🌰"><span class="nav-number">3.</span> <span class="nav-text">举个栗子🌰</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monad的定义"><span class="nav-number">4.</span> <span class="nav-text">Monad的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#答案：通过unit和flatmap实现map"><span class="nav-number">7.</span> <span class="nav-text">答案：通过unit和flatMap实现map</span></a></li></ol></div>
             
 
           </div>

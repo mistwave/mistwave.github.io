@@ -287,6 +287,187 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2016/08/27/PIHex5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yifu Duan">
+      <meta itemprop="description" content="Contact me at me###duanyifu.com">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yifu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2016/08/27/PIHex5/" class="post-title-link" itemprop="url">Programming in Haskell Chapter5 Exercises Solutions</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2016-08-27 23:13:37" itemprop="dateCreated datePublished" datetime="2016-08-27T23:13:37+08:00">2016-08-27</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2016-08-28 23:49:38" itemprop="dateModified" datetime="2016-08-28T23:49:38+08:00">2016-08-28</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Haskell/" itemprop="url" rel="index"><span itemprop="name">Haskell</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
+<hr>
+<h4 id="用list-comprehension计算1到100平方和">用List Comprehension计算1到100平方和</h4>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">sum</span> [x^<span class="number">2</span> | x &lt;- [<span class="number">1.</span><span class="number">.100</span>]]</span><br></pre></td></tr></table></figure>
+<h4 id="定义库函数replicate">定义库函数<code>replicate</code></h4>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- &gt; replicate 3 True</span></span><br><span class="line"><span class="comment">-- [True, True, True]</span></span><br><span class="line"></span><br><span class="line"><span class="title">myreplicate</span> :: <span class="type">Int</span> -&gt; a -&gt; [a]</span><br><span class="line"><span class="title">myreplicate</span> n x = [x | _ &lt;- [<span class="number">1.</span>.n]]</span><br></pre></td></tr></table></figure>
+<h4 id="定义函数pyths">定义函数<code>pyths</code></h4>
+<p><code>pyths n</code>返回满足<code>x^2 + y^2 == z^2</code>的三元组<code>(x, y, z)</code>，其中xyz都小于等于n</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- &gt; paths 10</span></span><br><span class="line"><span class="comment">-- [(3, 4, 5), (4, 3, 5), (6, 8, 10), (8, 6, 10)]</span></span><br><span class="line"></span><br><span class="line"><span class="title">pyths</span>   :: <span class="type">Int</span> -&gt; [(<span class="type">Int</span>, <span class="type">Int</span>, <span class="type">Int</span>)]</span><br><span class="line"><span class="title">pyths</span> n = [(x,y,z) | x &lt;- [<span class="number">1.</span>.n],</span><br><span class="line">                     y &lt;- [<span class="number">1.</span>.n],</span><br><span class="line">                     z &lt;- [<span class="number">1.</span>.n],</span><br><span class="line">                     x^<span class="number">2</span> + y^<span class="number">2</span> == z^<span class="number">2</span>]</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2016/08/27/PIHex5/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2016/08/26/PIHex4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -399,9 +580,9 @@
         
           <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="定义-halve"><a class="header-anchor" href="#定义-halve">¶</a>定义 halve</h4>
+<h4 id="定义-halve">定义 halve</h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">halve</span> :: [a] -&gt; ([a], [a])</span><br><span class="line"><span class="title">halve</span> a = <span class="keyword">let</span> n = (length a) `div` <span class="number">2</span> <span class="keyword">in</span> (take n a, drop n a)</span><br></pre></td></tr></table></figure>
-<h4 id="用三种方式定义safetail"><a class="header-anchor" href="#用三种方式定义safetail">¶</a>用三种方式定义safetail</h4>
+<h4 id="用三种方式定义safetail">用三种方式定义safetail</h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- conditional expression</span></span><br><span class="line"><span class="title">safetail1</span> :: [a] -&gt; [a]</span><br><span class="line"><span class="title">safetail1</span> xs = <span class="keyword">if</span> null xs <span class="keyword">then</span> xs <span class="keyword">else</span> tail xs</span><br><span class="line"></span><br><span class="line"><span class="comment">-- guarded equations</span></span><br><span class="line"><span class="title">safetail2</span> :: [a] -&gt; [a]</span><br><span class="line"><span class="title">safetail2</span> xs | null xs      = xs</span><br><span class="line">             | otherwise    = tail xs</span><br><span class="line"></span><br><span class="line"><span class="comment">-- pattern matching</span></span><br><span class="line"><span class="title">safetail3</span> :: [a] -&gt; [a]</span><br><span class="line"><span class="title">safetail3</span> [] = []</span><br><span class="line"><span class="title">safetail3</span> (_:xs) = xs</span><br><span class="line"></span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
@@ -577,9 +758,9 @@
         
           <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="写出这些表达式的type"><a class="header-anchor" href="#写出这些表达式的type">¶</a>写出这些表达式的type</h4>
+<h4 id="写出这些表达式的type">写出这些表达式的type</h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">['a', 'b', 'c']             <span class="comment">-- :: [Char]</span></span><br><span class="line">('a', 'b', 'c')             <span class="comment">-- :: (Char, Char, Char)</span></span><br><span class="line">[(<span class="type">False</span>, '<span class="type">O'</span>), (<span class="type">True</span>, '<span class="number">1</span>')] <span class="comment">-- :: [(Bool, Char)]</span></span><br><span class="line">([<span class="type">False</span>, <span class="type">True</span>], ['<span class="number">0</span>', '<span class="number">1</span>']) <span class="comment">-- :: ([Bool], [Char])</span></span><br><span class="line">[tail, init, reverse]       <span class="comment">-- :: [[a] -&gt; [a]]</span></span><br></pre></td></tr></table></figure>
-<h4 id="写出这些函数的type"><a class="header-anchor" href="#写出这些函数的type">¶</a>写出这些函数的type</h4>
+<h4 id="写出这些函数的type">写出这些函数的type</h4>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">second</span> xs       = head (tail xs)    <span class="comment">-- [a] -&gt; a</span></span><br><span class="line"><span class="title">swap</span> (x, y)     = (y, x)            <span class="comment">-- (a, b) -&gt; (b, a)</span></span><br><span class="line"><span class="title">pair</span> x y        = (x, y)            <span class="comment">-- a -&gt; b -&gt; (a, b)</span></span><br><span class="line"><span class="title">double</span> x        = x * <span class="number">2</span>             <span class="comment">-- Num a =&gt; a -&gt; a</span></span><br><span class="line"><span class="title">palindrome</span> xs   = reverse xs == xs  <span class="comment">-- Eq a =&gt; a -&gt; Bool</span></span><br><span class="line"><span class="title">twice</span> f x       = f (f x)           <span class="comment">-- (a -&gt; a) -&gt; a -&gt; a</span></span><br></pre></td></tr></table></figure>
           <!--noindex-->
           
@@ -743,14 +924,14 @@
 
       
         
-          <h3 id="基础准备"><a class="header-anchor" href="#基础准备">¶</a>基础准备</h3>
+          <h3 id="基础准备">基础准备</h3>
 <ul>
 <li><a href="https://www.haskell.org/downloads" target="_blank" rel="noopener">Haskell</a> (我选择的是Haskell Platform 8.0.1)</li>
 <li><a href="https://www.sublimetext.com/3" target="_blank" rel="noopener">Sublime Text</a></li>
 <li><a href="https://packagecontrol.io/installation" target="_blank" rel="noopener">Package Control: The Sublime Text package manager</a></li>
 </ul>
-<h3 id="安装插件"><a class="header-anchor" href="#安装插件">¶</a>安装插件</h3>
-<h4 id="sublimehaskell"><a class="header-anchor" href="#sublimehaskell">¶</a>SublimeHaskell</h4>
+<h3 id="安装插件">安装插件</h3>
+<h4 id="sublimehaskell">SublimeHaskell</h4>
 <p>在Package Control中安装SublimeHaskell。<br>
 插件安装完成后，重启Sublime报错，提示需要安装hsdev cabal package。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">SublimeHaskell: hsdev executable couldn&apos;t be found!</span><br><span class="line">It&apos;s used in most features of SublimeHaskell</span><br><span class="line">Check if it&apos;s installed and in PATH</span><br><span class="line">If it&apos;s not installed, run &apos;cabal install hsdev&apos; to install hsdev</span><br><span class="line">You may also want to adjust &apos;add_to_PATH&apos; setting</span><br></pre></td></tr></table></figure>
@@ -929,14 +1110,14 @@
           
             <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="给算数表达式加上括号"><a class="header-anchor" href="#给算数表达式加上括号">¶</a>给算数表达式加上括号</h4>
+<h4 id="给算数表达式加上括号">给算数表达式加上括号</h4>
 <p>按照运算符优先级就可以，略过。</p>
-<h4 id="修改代码-使之正确"><a class="header-anchor" href="#修改代码-使之正确">¶</a>修改代码，使之正确</h4>
+<h4 id="修改代码-使之正确">修改代码，使之正确</h4>
 <p>将<code>length xs</code>用括号括起来即可。</p>
-<h4 id="尝试定义last"><a class="header-anchor" href="#尝试定义last">¶</a>尝试定义<code>last</code></h4>
+<h4 id="尝试定义last">尝试定义<code>last</code></h4>
 <p><code>last</code>: 返回非空list的最后一个元素</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">mylast</span> a = a !! ((length a) - <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
-<h4 id="尝试定义init"><a class="header-anchor" href="#尝试定义init">¶</a>尝试定义<code>init</code></h4>
+<h4 id="尝试定义init">尝试定义<code>init</code></h4>
 <p><code>init</code>: 删除非空list的最后一个元素，并返回list</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">myinit1</span> a = take ((length a) - <span class="number">1</span>) a</span><br><span class="line"></span><br><span class="line"><span class="title">myinit2</span> a = <span class="keyword">let</span> n = length a <span class="keyword">in</span> reverse (tail (reverse a))</span><br></pre></td></tr></table></figure>
 
@@ -1094,7 +1275,7 @@
 
       
         
-          <h3 id="问题描述"><a class="header-anchor" href="#问题描述">¶</a>问题描述</h3>
+          <h3 id="问题描述">问题描述</h3>
 <p>用<code>hexo d</code>命令部署的时候总是会卡住很久，反复尝试了几次后，每次都是control+C告终。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">▶ hexo d</span><br><span class="line">INFO  Deploying: git</span><br><span class="line">INFO  Clearing .deploy_git folder...</span><br><span class="line">INFO  Copying files from public folder...</span><br><span class="line">On branch master</span><br><span class="line">nothing to commit, working directory clean</span><br><span class="line">^CINFO  Bye!</span><br></pre></td></tr></table></figure>
           <!--noindex-->
@@ -1271,7 +1452,7 @@
         
           <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
 <hr>
-<h4 id="给出double-double-2-的另外一种可能解释"><a class="header-anchor" href="#给出double-double-2-的另外一种可能解释">¶</a>给出<code>double (double 2)</code>的另外一种可能解释。</h4>
+<h4 id="给出double-double-2-的另外一种可能解释">给出<code>double (double 2)</code>的另外一种可能解释。</h4>
 <p>书上给的例子是应用序和正则序（从左向右），可以将正则序（从右向左）当作答案。</p>
 <figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">double</span> (double <span class="number">2</span>)</span><br><span class="line">= double <span class="number">2</span> + double <span class="number">2</span></span><br><span class="line">= double <span class="number">2</span> + (<span class="number">2</span> + <span class="number">2</span>)</span><br><span class="line">= double <span class="number">2</span> + <span class="number">4</span></span><br><span class="line">= (<span class="number">2</span> + <span class="number">2</span>) + <span class="number">4</span></span><br><span class="line">= <span class="number">4</span> + <span class="number">4</span></span><br><span class="line">= <span class="number">8</span></span><br></pre></td></tr></table></figure>
           <!--noindex-->
@@ -1370,7 +1551,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

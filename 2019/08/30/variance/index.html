@@ -99,18 +99,18 @@
   };
 </script>
 
-  <meta name="description" content="¶一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
-<meta name="keywords" content="Functional Programming,Java,TypeScript">
+  <meta name="description" content="一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
+<meta name="keywords" content="Java,Functional Programming,TypeScript">
 <meta property="og:type" content="article">
 <meta property="og:title" content="浅谈covariance和contravariance">
 <meta property="og:url" content="http://duanyifu.com/2019/08/30/variance/index.html">
 <meta property="og:site_name" content="Yifu&#39;s Blog">
-<meta property="og:description" content="¶一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
+<meta property="og:description" content="一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2019-09-01T10:51:11.298Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="浅谈covariance和contravariance">
-<meta name="twitter:description" content="¶一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
+<meta name="twitter:description" content="一些定义 考虑类型A和C，以及泛型构造器F&amp;lt;T&amp;gt;：  如果我们在一个需要A的地方，总能使用C，我们就可以说C是A的子类型（subtype）[1]，记作C &amp;lt;: A。 如果F是协变的（covariant），且C &amp;lt;: A，则有F&amp;lt;C&amp;gt; &amp;lt;: F&amp;lt;A&amp;gt;。 如果F是逆变的（contravariant），且C &amp;lt;: A，则有F&amp;lt;A&amp;gt;">
 
 
 
@@ -403,7 +403,7 @@
       
 
       
-        <h2 id="一些定义"><a class="header-anchor" href="#一些定义">¶</a>一些定义</h2>
+        <h2 id="一些定义">一些定义</h2>
 <p>考虑类型<code>A</code>和<code>C</code>，以及泛型构造器<code>F&lt;T&gt;</code>：</p>
 <ul>
 <li><strong>如果我们在一个需要<code>A</code>的地方，总能使用<code>C</code>，我们就可以说<code>C</code>是<code>A</code>的子类型（subtype）<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>，记作<code>C &lt;: A</code>。</strong></li>
@@ -411,7 +411,7 @@
 <li><strong>如果F是逆变的（contravariant），且<code>C &lt;: A</code>，则有<code>F&lt;A&gt; &lt;: F&lt;C&gt;</code>。</strong></li>
 <li><strong>如果F是不变的（invariant），无论<code>A</code>与<code>C</code>是什么关系，<code>F&lt;C&gt;</code> 与 <code>F&lt;A&gt;</code>都没有关系。</strong></li>
 </ul>
-<h2 id="collection视角"><a class="header-anchor" href="#collection视角">¶</a>Collection视角</h2>
+<h2 id="collection视角">Collection视角</h2>
 <p>先举用例子来看看Collection的型变规则。</p>
 <p><code>Duck</code>是<code>Bird</code>的子类，<code>Bird</code>是<code>Animal</code>的子类，记作<code>Duck &lt;: Bird &lt;: Animal</code>。</p>
 <p>TypeScript中的<code>Array</code>是协变的（covariant）：</p>
@@ -429,7 +429,7 @@
 <li>反之，如果你只写入<code>List</code>（Collection是consumer），那么你最好接受一个逆变的Collection。</li>
 </ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">namesOfBirds</span><span class="params">(List&lt;? extends Bird&gt; birds)</span> </span>&#123;</span><br><span class="line">  birds.forEach(bird -&gt; System.out.println(bird.getName()));</span><br><span class="line">&#125;</span><br><span class="line">namesOfBird(ducks); <span class="comment">// Legal; covariant</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addAOwl</span><span class="params">(List&lt;? <span class="keyword">super</span> Bird&gt; birds)</span> </span>&#123;</span><br><span class="line">  Bird aOwl = <span class="keyword">new</span> Bird(<span class="string">"owl"</span>);</span><br><span class="line">  birds.add(aOwl);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// It is natural to add a owl into a List&lt;Animal&gt;</span></span><br><span class="line">addAOwl(animals) <span class="comment">// Legal; contravariant</span></span><br></pre></td></tr></table></figure>
-<h2 id="function-type"><a class="header-anchor" href="#function-type">¶</a>Function Type</h2>
+<h2 id="function-type">Function Type</h2>
 <p>容器类型的型变其实是比较符合直觉的，函数类型就很反直觉了。</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Function1</span>[-<span class="type">T1</span>, +<span class="type">R</span>]</span></span><br></pre></td></tr></table></figure>
 <p>这是Scala标准库定义的单参函数的trait（可以理解为interface），类型为<code>T1 -&gt; R</code>，其中<code>T1</code>是逆变的，<code>R</code>是协变的<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>。</p>
@@ -458,7 +458,7 @@
 <p>或者说：<strong>对于函数p和q，当p的参数更general，返回值更specific时，p可以安全地替代q</strong>。</p>
 <p>其实，Java8的<code>Function</code>接口的型变规则也是这样的，<code>compose</code>和<code>andThen</code>都是接收了一个<code>Function&lt;? super V, ? extends T&gt;</code>，恰恰正是<strong>参数逆变，返回值协变</strong>。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// see http://hg.openjdk.java.net/jdk8/jdk8/jdk/file/687fd7c7986d/src/share/classes/java/util/function/Function.java</span></span><br><span class="line"><span class="meta">@FunctionalInterface</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Function</span>&lt;<span class="title">T</span>, <span class="title">R</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">default</span> &lt;V&gt; <span class="function">Function&lt;V, R&gt; <span class="title">compose</span><span class="params">(Function&lt;? <span class="keyword">super</span> V, ? extends T&gt; before)</span> </span>&#123;</span><br><span class="line">        Objects.requireNonNull(before);</span><br><span class="line">        <span class="keyword">return</span> (V v) -&gt; apply(before.apply(v));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">default</span> &lt;V&gt; <span class="function">Function&lt;T, V&gt; <span class="title">andThen</span><span class="params">(Function&lt;? <span class="keyword">super</span> R, ? extends V&gt; after)</span> </span>&#123;</span><br><span class="line">        Objects.requireNonNull(after);</span><br><span class="line">        <span class="keyword">return</span> (T t) -&gt; after.apply(apply(t));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="references"><a class="header-anchor" href="#references">¶</a>References</h2>
+<h2 id="references">References</h2>
 <ol>
 <li><a href="https://www.stephanboyer.com/post/132/what-are-covariance-and-contravariance" target="_blank" rel="noopener">What are covariance and contravariance?</a></li>
 <li><a href="https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)" target="_blank" rel="noopener">Covariance and contravariance (computer science)</a></li>
@@ -506,9 +506,9 @@
         
         <div class="post-tags">
           
-            <a href="/tags/Functional-Programming/" rel="tag"># Functional Programming</a>
-          
             <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Functional-Programming/" rel="tag"># Functional Programming</a>
           
             <a href="/tags/TypeScript/" rel="tag"># TypeScript</a>
           
@@ -603,7 +603,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -712,7 +712,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一些定义"><span class="nav-number">1.</span> <span class="nav-text">¶一些定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#collection视角"><span class="nav-number">2.</span> <span class="nav-text">¶Collection视角</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#function-type"><span class="nav-number">3.</span> <span class="nav-text">¶Function Type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#references"><span class="nav-number">4.</span> <span class="nav-text">¶References</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一些定义"><span class="nav-number">1.</span> <span class="nav-text">一些定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#collection视角"><span class="nav-number">2.</span> <span class="nav-text">Collection视角</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#function-type"><span class="nav-number">3.</span> <span class="nav-text">Function Type</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#references"><span class="nav-number">4.</span> <span class="nav-text">References</span></a></li></ol></div>
             
 
           </div>
