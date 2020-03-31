@@ -287,6 +287,176 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2020/03/31/kafka-producer-message-lost/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yifu Duan">
+      <meta itemprop="description" content="Contact me at me###duanyifu.com">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yifu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2020/03/31/kafka-producer-message-lost/" class="post-title-link" itemprop="url">记一个Kafka Producer丢消息问题</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2020-03-31 09:31:56 / Modified: 16:38:43" itemprop="dateCreated datePublished" datetime="2020-03-31T09:31:56+08:00">2020-03-31</time>
+            </span>
+          
+
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Programming/" itemprop="url" rel="index"><span itemprop="name">Programming</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h2 id="背景">背景</h2>
+<p>通过Spark SQL从Hive读取大约1M行的数据，一次性写入Kafka时，大概会丢失20%的数据。</p>
+<p><code>producer</code>的设置只设置了<code>acks=all</code>，使用的是异步的<code>send()</code>。</p>
+<p>Kafka Cluster有4个brokers。</p>
+<h2 id="排查">排查</h2>
+<p>首先，注意到<code>producer</code>在程序结束时没有调用<code>flush()</code>，加上<code>flush()</code>之后，问题依旧。</p>
+<p>从<em>Kafka The Definitive Guide</em>中了解到，设置<code>retries</code>参数可以令producer自动重试<em>retriable errors</em>，设置<code>retries=100</code>，问题依旧。</p>
+<p>重试也不能解决这个问题，那么将异常打印出来试试，在<code>send()</code>中传入一个失败时打印异常的<code>Callback</code>，顺便记录下失败次数：</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2020/03/31/kafka-producer-message-lost/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2020/01/31/客户端删除DOM节点的几种方式/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1898,184 +2068,6 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
   </article>
 
     
-        
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://duanyifu.com/2016/08/31/PIHex7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Yifu Duan">
-      <meta itemprop="description" content="Contact me at me###duanyifu.com">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Yifu's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2016/08/31/PIHex7/" class="post-title-link" itemprop="url">Programming in Haskell Chapter7 Exercises Solutions</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-
-          
-          
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2016-08-31 21:14:51" itemprop="dateCreated datePublished" datetime="2016-08-31T21:14:51+08:00">2016-08-31</time>
-            </span>
-          
-
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2016-09-04 21:23:12" itemprop="dateModified" datetime="2016-09-04T21:23:12+08:00">2016-09-04</time>
-              </span>
-            
-          
-
-          
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Haskell/" itemprop="url" rel="index"><span itemprop="name">Haskell</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-          
-
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p><em>Programming in Haskell</em>是一本入门Haskell的好书，介绍页面以及配套的slides, vedios, codes都在<a href="http://www.cs.nott.ac.uk/~pszgmh/book.html" target="_blank" rel="noopener">这里</a>。</p>
-<hr>
-<h4 id="用map和filter表示-f-x-x-xs-p-x">用<code>map</code>和<code>filter</code>表示<code>[f x | x &lt;- xs, p x]</code></h4>
-<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- [f x | x &lt;- xs, p x]</span></span><br><span class="line"><span class="comment">-- [f x | x &lt;- xs, p x]</span></span><br><span class="line"><span class="comment">-- = map f (filter p xs)</span></span><br></pre></td></tr></table></figure>
-<h4 id="定义高阶函数all-any-takewhile-dropwhile">定义高阶函数<code>all</code>, <code>any</code>, <code>takeWhile</code>, <code>dropWhile</code></h4>
-<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">myall</span> :: (a -&gt; <span class="type">Bool</span>) -&gt; [a] -&gt; <span class="type">Bool</span></span><br><span class="line"><span class="title">myall</span> _ [] = <span class="type">True</span></span><br><span class="line"><span class="title">myall</span> p (x : xs) | p x == <span class="type">False</span> = <span class="type">False</span></span><br><span class="line">                 | otherwise = myall p xs</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; myall (&gt;3) [1..3]</span></span><br><span class="line"><span class="comment">-- False</span></span><br><span class="line"><span class="comment">-- *Main&gt; myall (&gt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- False</span></span><br><span class="line"><span class="comment">-- *Main&gt; myall (&gt;3) [4..5]</span></span><br><span class="line"><span class="comment">-- True</span></span><br><span class="line"></span><br><span class="line"><span class="title">myany</span> :: (a -&gt; <span class="type">Bool</span>) -&gt; [a] -&gt; <span class="type">Bool</span></span><br><span class="line"><span class="title">myany</span> _ [] = <span class="type">False</span></span><br><span class="line"><span class="title">myany</span> p (x : xs) | p x == <span class="type">True</span> = <span class="type">True</span></span><br><span class="line">                 | otherwise = myany p xs</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; myany (&gt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- True</span></span><br><span class="line"><span class="comment">-- *Main&gt; myany (&gt;3) [1..3]</span></span><br><span class="line"><span class="comment">-- False</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="title">mytakeWhile</span> :: (a -&gt; <span class="type">Bool</span>) -&gt; [a] -&gt; [a]</span><br><span class="line"><span class="title">mytakeWhile</span> _ [] = []</span><br><span class="line"><span class="title">mytakeWhile</span> p (x : xs) | p x == <span class="type">True</span> = x : mytakeWhile p xs</span><br><span class="line">                       | otherwise = []</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; mytakeWhile (&lt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- [1,2]</span></span><br><span class="line"><span class="comment">-- *Main&gt; mytakeWhile (&gt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- []</span></span><br><span class="line"><span class="comment">-- *Main&gt; mytakeWhile (&lt;3) [1,2,3,1,2]</span></span><br><span class="line"><span class="comment">-- [1,2]</span></span><br><span class="line"></span><br><span class="line"><span class="title">mydropWhile</span> :: (a -&gt; <span class="type">Bool</span>) -&gt; [a] -&gt; [a]</span><br><span class="line"><span class="title">mydropWhile</span> _ [] = []</span><br><span class="line"><span class="title">mydropWhile</span> p (x : xs) | p x == <span class="type">True</span> = mydropWhile p xs</span><br><span class="line">                       | otherwise = x : xs</span><br><span class="line"></span><br><span class="line"><span class="comment">-- *Main&gt; mydropWhile (&lt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- [3,4,5]</span></span><br><span class="line"><span class="comment">-- *Main&gt; mydropWhile (&gt;3) [1..5]</span></span><br><span class="line"><span class="comment">-- [1,2,3,4,5]</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2016/08/31/PIHex7/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
   </section>
 
   
@@ -2123,7 +2115,7 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-count">19</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -2197,7 +2189,11 @@ IDE：<a href="https://racket-lang.org/" target="_blank" rel="noopener">DrRacket
         
           
         
-        <span class="site-state-item-count">18</span>
+          
+        
+          
+        
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">tags</span>
         
       </div>

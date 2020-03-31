@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://duanyifu.com/"/>
-  <updated>2020-01-31T08:41:06.385Z</updated>
+  <updated>2020-03-31T08:38:43.377Z</updated>
   <id>http://duanyifu.com/</id>
   
   <author>
@@ -15,6 +15,37 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>记一个Kafka Producer丢消息问题</title>
+    <link href="http://duanyifu.com/2020/03/31/kafka-producer-message-lost/"/>
+    <id>http://duanyifu.com/2020/03/31/kafka-producer-message-lost/</id>
+    <published>2020-03-31T01:31:56.000Z</published>
+    <updated>2020-03-31T08:38:43.377Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="背景">背景</h2><p>通过Spark SQL从Hive读取大约1M行的数据，一次性写入Kafka时，大概会丢失20%的数据。</p><p><code>producer</code>的设置只设置了<code>acks=all</code>，使用的是异步的<code>send()</code>。</p><p>Kafka Cluster有4个brokers。</p><h2 id="排查">排查</h2><p>首先，注意到<code>producer</code>在程序结束时没有调用<code>flush()</code>，加上<code>flush()</code>之后，问题依旧。</p><p>从<em>Kafka The Definitive Guide</em>中了解到，设置<code>retries</code>参数可以令producer自动重试<em>retriable errors</em>，设置<code>retries=100</code>，问题依旧。</p><p>重试也不能解决这个问题，那么将异常打印出来试试，在<code>send()</code>中传入一个失败时打印异常的<code>Callback</code>，顺便记录下失败次数：</p><a id="more"></a><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">producer.send(record, <span class="keyword">new</span> <span class="type">Callback</span> &#123;</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">onCompletion</span></span>(metadata: <span class="type">RecordMetadata</span>, exception: <span class="type">Exception</span>): <span class="type">Unit</span> = &#123;</span><br><span class="line">    <span class="keyword">if</span> (exception != <span class="literal">null</span>) &#123;</span><br><span class="line">      failCount.incrementAndGet()</span><br><span class="line">      logger.error(<span class="string">"failed to send message: &#123;&#125;"</span>, record)</span><br><span class="line">      logger.error(<span class="string">"exception: "</span>, exception)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      successCount.incrementAndGet()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><p>再次运行，在Spark Executors的stderr中可以看见：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">20/03/30 17:33:43 ERROR root: failed to send message: ProducerRecord(......)</span><br><span class="line">20/03/30 17:33:43 ERROR root: exception: </span><br><span class="line">org.apache.kafka.common.errors.TimeoutException: Expiring 288 record(s) for TOPICNAME-18: 30001 ms has passed since batch creation plus linger time</span><br></pre></td></tr></table></figure><p>嗯？<code>TimeoutException</code>？</p><p><a href="https://stackoverflow.com/questions/46750420/kafka-producer-error-expiring-10-records-for-topicxxxxxx-6686-ms-has-passed" target="_blank" rel="noopener">这里</a>说问题是在于<code>send()</code>太快，<code>KafkaProducer</code>有一个buffer（参数<code>buffer.memory</code>）来存放即将发送的<code>ProducerRecord</code>，当这个buffer满了的时候，后续的<code>send()</code>就会阻塞（或抛出异常，根据配置而定），这个阻塞的上限时间由参数<code>request.timeout.ms</code>确定，超出就会抛出<code>TimeoutException</code>。</p><p>由于我们是一次性写入大量数据，可能producer处理不来，就会造成这种情况。</p><p><code>request.timeout.ms</code>默认是30000，也就是30s，尝试增大为300s后，丢失数据量降低至8%左右。</p><p>至此，问题的原因就找到了。</p><h2 id="继续优化">继续优化</h2><p>难道要继续增大超时时间吗？这里的本质原因是producer处理吞吐量不够。所以增加producer的数量也是一种办法。</p><p>这是一个Spark SQL程序，每个parition分配了一个Kafka producer。</p><p>通过Spark Web UI监控到，当执行这部分代码的时候，只有两个task，推测是由于DataFrame的partition数量过少。</p><p>根据<a href="https://stackoverflow.com/questions/44061443/how-does-spark-sql-decide-the-number-of-partitions-it-will-use-when-loading-data" target="_blank" rel="noopener">这里</a>的说法，HDFS blockSize决定了Spark SQL读取Hive的DataFrame的partition数量，Hadoop 2.x的默认blockSize是大小是128MB。</p><p>假设我们一条消息占用20bytes，一百万条也才20M，生成这部分Hive数据是顺序写入的，所以默认的parition数量只有一个。</p><p>那么，尝试一下手动增大partition数量：</p><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// before</span></span><br><span class="line">df.mapParitions(...)</span><br><span class="line"><span class="comment">// after</span></span><br><span class="line">df.repartition(<span class="number">50</span>) <span class="comment">// number of paritions</span></span><br><span class="line">  .mapParitions(...)</span><br></pre></td></tr></table></figure><p>问题解决了，数据一条都没有丢。</p><h2 id="总结">总结</h2><ol><li><code>KafkaProducer</code>的异步<code>send()</code>，在buffer满了的时候，也会block；</li><li>吞吐量是一个需要考虑的指标，即使是一个简单的任务，也可能因为吞吐量不匹配而出问题；</li><li>多读书，<em>Kafka The Definitive Guide</em>书里都有；</li><li>或者多读文档，<a href="https://kafka.apache.org/24/javadoc/index.html?org/apache/kafka/clients/producer/KafkaProducer.html" target="_blank" rel="noopener">官方文档</a>里也都有。</li></ol><h2 id="致谢">致谢</h2><p>感谢<a href="https://liam-blog.ml/" target="_blank" rel="noopener">@liuyuan</a>大佬为我解惑，问啥啥都懂，太强了！</p><h2 id="references">references</h2><ol><li><em>Kafka The Definitive Guide</em></li><li><a href="https://stackoverflow.com/questions/46750420/kafka-producer-error-expiring-10-records-for-topicxxxxxx-6686-ms-has-passed" target="_blank" rel="noopener">Kafka Producer error Expiring 10 record(s) for TOPIC:XXXXXX: 6686 ms has passed since batch creation plus linger time - Stack Overflow</a></li><li><a href="https://stackoverflow.com/questions/44061443/how-does-spark-sql-decide-the-number-of-partitions-it-will-use-when-loading-data" target="_blank" rel="noopener">How does Spark SQL decide the number of partitions it will use when loading data from a Hive table? - Stack Overflow</a></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;背景&quot;&gt;背景&lt;/h2&gt;
+&lt;p&gt;通过Spark SQL从Hive读取大约1M行的数据，一次性写入Kafka时，大概会丢失20%的数据。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;producer&lt;/code&gt;的设置只设置了&lt;code&gt;acks=all&lt;/code&gt;，使用的是异步的&lt;code&gt;send()&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;Kafka Cluster有4个brokers。&lt;/p&gt;
+&lt;h2 id=&quot;排查&quot;&gt;排查&lt;/h2&gt;
+&lt;p&gt;首先，注意到&lt;code&gt;producer&lt;/code&gt;在程序结束时没有调用&lt;code&gt;flush()&lt;/code&gt;，加上&lt;code&gt;flush()&lt;/code&gt;之后，问题依旧。&lt;/p&gt;
+&lt;p&gt;从&lt;em&gt;Kafka The Definitive Guide&lt;/em&gt;中了解到，设置&lt;code&gt;retries&lt;/code&gt;参数可以令producer自动重试&lt;em&gt;retriable errors&lt;/em&gt;，设置&lt;code&gt;retries=100&lt;/code&gt;，问题依旧。&lt;/p&gt;
+&lt;p&gt;重试也不能解决这个问题，那么将异常打印出来试试，在&lt;code&gt;send()&lt;/code&gt;中传入一个失败时打印异常的&lt;code&gt;Callback&lt;/code&gt;，顺便记录下失败次数：&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="Programming" scheme="http://duanyifu.com/categories/Programming/"/>
+    
+    
+      <category term="Kafka" scheme="http://duanyifu.com/tags/Kafka/"/>
+    
+      <category term="Spark" scheme="http://duanyifu.com/tags/Spark/"/>
+    
+  </entry>
   
   <entry>
     <title>客户端删除DOM节点的几种方式</title>
